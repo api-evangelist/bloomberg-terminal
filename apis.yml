@@ -1,0 +1,78 @@
+name: Bloomberg Terminal
+description: Bloomberg Terminal is a computer software system provided by Bloomberg L.P. that enables professionals in the financial service sector and other industries to access the Bloomberg Professional service through which users can monitor and analyze real-time financial market data and place trades.
+image: https://www.bloomberg.com/company/wp-content/uploads/sites/2/2021/09/bloomberg-logo-1.png
+url: https://www.bloomberg.com/professional/solution/bloomberg-terminal/
+created: '2024'
+modified: '2024'
+specificationVersion: '0.18'
+apis:
+- name: Bloomberg Data API
+  description: Provides programmatic access to Bloomberg data including real-time market data, reference data, historical data, and pricing information.
+  image: https://www.bloomberg.com/company/wp-content/uploads/sites/2/2021/09/bloomberg-logo-1.png
+  humanURL: https://www.bloomberg.com/professional/support/api-library/
+  baseURL: https://api.bloomberg.com
+  tags:
+  - financial data
+  - market data
+  - real-time
+  - pricing
+  properties:
+  - type: Documentation
+    url: https://www.bloomberg.com/professional/support/api-library/
+  - type: Authentication
+    url: https://www.bloomberg.com/professional/support/api-library/
+  contact:
+  - FN: Bloomberg API Support
+    email: apisupport@bloomberg.net
+- name: Bloomberg SAPI
+  description: Server API (SAPI) providing server-side access to Bloomberg data for institutional clients and enterprise applications.
+  image: https://www.bloomberg.com/company/wp-content/uploads/sites/2/2021/09/bloomberg-logo-1.png
+  humanURL: https://www.bloomberg.com/professional/support/api-library/
+  baseURL: https://api.bloomberg.com/sapi
+  tags:
+  - server API
+  - enterprise
+  - institutional
+  - data feeds
+  properties:
+  - type: Documentation
+    url: https://www.bloomberg.com/professional/support/api-library/
+  - type: Getting Started
+    url: https://www.bloomberg.com/professional/support/api-library/
+- name: Bloomberg Desktop API
+  description: Desktop API enabling custom applications to integrate directly with Bloomberg Terminal for accessing market data, executing functions, and building custom workflows.
+  image: https://www.bloomberg.com/company/wp-content/uploads/sites/2/2021/09/bloomberg-logo-1.png
+  humanURL: https://www.bloomberg.com/professional/support/api-library/
+  tags:
+  - desktop
+  - terminal integration
+  - custom applications
+  - excel
+  properties:
+  - type: Documentation
+    url: https://www.bloomberg.com/professional/support/api-library/
+  - type: SDK
+    url: https://www.bloomberg.com/professional/support/api-library/
+- name: Bloomberg BPIPE
+  description: Bloomberg Pipe (BPIPE) delivers real-time and reference data directly to client applications for systematic trading, quantitative analysis, and automated workflows.
+  image: https://www.bloomberg.com/company/wp-content/uploads/sites/2/2021/09/bloomberg-logo-1.png
+  humanURL: https://www.bloomberg.com/professional/product/bpipe/
+  tags:
+  - real-time data
+  - streaming
+  - systematic trading
+  - quantitative
+  properties:
+  - type: Documentation
+    url: https://www.bloomberg.com/professional/product/bpipe/
+  - type: Product Info
+    url: https://www.bloomberg.com/professional/product/bpipe/
+maintainers:
+- FN: Bloomberg L.P.
+  email: support@bloomberg.net
+tags:
+- financial services
+- market data
+- trading
+- analytics
+- enterprise
