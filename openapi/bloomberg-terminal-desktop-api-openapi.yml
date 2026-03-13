@@ -1,0 +1,620 @@
+openapi: 3.1.0
+info:
+  title: Bloomberg Desktop API (DAPI)
+  description: >-
+    The Bloomberg Desktop API (DAPI) enables custom applications to integrate
+    directly with the Bloomberg Terminal for accessing market data, executing
+    functions, and building custom workflows on the desktop. DAPI connects
+    to the locally running Bloomberg Terminal instance and provides access
+    to the same BLPAPI services (//blp/refdata, //blp/mktdata, //blp/apiflds,
+    //blp/instruments) in a desktop context. It is commonly used for Excel
+    add-ins, custom trading tools, and analyst productivity applications.
+    The SDK supports C++, Java, C# (.NET), Python, and COM (for VBA/Excel
+    integration).
+  version: 3.26.1
+  contact:
+    name: Bloomberg API Support
+    email: apisupport@bloomberg.net
+    url: https://www.bloomberg.com/professional/support/api-library/
+  license:
+    name: Bloomberg Professional Services
+    url: https://www.bloomberg.com/notices/tos/
+  x-logo:
+    url: https://www.bloomberg.com/company/wp-content/uploads/sites/2/2021/09/bloomberg-logo-1.png
+servers:
+  - url: https://localhost:8194
+    description: >-
+      Bloomberg Desktop API connects to the local Bloomberg Terminal
+      instance. The default BLPAPI connection is to localhost on port 8194.
+tags:
+  - name: Reference Data
+    description: >-
+      Desktop access to the //blp/refdata service for current, historical,
+      and intraday data.
+  - name: Market Data
+    description: >-
+      Desktop real-time market data subscriptions via //blp/mktdata.
+  - name: Field Information
+    description: >-
+      Desktop access to the //blp/apiflds service for field metadata.
+  - name: Instruments
+    description: >-
+      Desktop instrument search via //blp/instruments.
+  - name: Excel Integration
+    description: >-
+      Operations commonly used in Excel/VBA integration through the
+      COM Data Control interface (BLP, BDH, BDS functions).
+paths:
+  /blp/refdata/ReferenceDataRequest:
+    post:
+      operationId: dapiReferenceDataRequest
+      summary: Request current reference data
+      description: >-
+        Retrieves current reference data for securities through the local
+        Bloomberg Terminal. This is the programmatic equivalent of the
+        BDP() function in Excel. The request runs in the context of the
+        logged-in Terminal user's entitlements.
+      tags:
+        - Reference Data
+        - Excel Integration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReferenceDataRequest'
+            examples:
+              bdpEquivalent:
+                summary: BDP-equivalent reference data request
+                value:
+                  securities:
+                    - IBM US Equity
+                    - AAPL US Equity
+                  fields:
+                    - PX_LAST
+                    - NAME
+                    - CUR_MKT_CAP
+                    - BEST_EPS
+      responses:
+        '200':
+          description: Reference data retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReferenceDataResponse'
+  /blp/refdata/HistoricalDataRequest:
+    post:
+      operationId: dapiHistoricalDataRequest
+      summary: Request historical data
+      description: >-
+        Retrieves historical end-of-day data through the local Bloomberg
+        Terminal. This is the programmatic equivalent of the BDH() function
+        in Excel.
+      tags:
+        - Reference Data
+        - Excel Integration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HistoricalDataRequest'
+            examples:
+              bdhEquivalent:
+                summary: BDH-equivalent historical request
+                value:
+                  securities:
+                    - SPX Index
+                  fields:
+                    - PX_LAST
+                  startDate: '20250101'
+                  endDate: '20260301'
+                  periodicitySelection: MONTHLY
+      responses:
+        '200':
+          description: Historical data retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HistoricalDataResponse'
+  /blp/refdata/IntradayBarRequest:
+    post:
+      operationId: dapiIntradayBarRequest
+      summary: Request intraday bar data
+      description: >-
+        Retrieves intraday OHLCV bar data through the local Bloomberg
+        Terminal.
+      tags:
+        - Reference Data
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IntradayBarRequest'
+      responses:
+        '200':
+          description: Intraday bar data retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntradayBarResponse'
+  /blp/refdata/IntradayTickRequest:
+    post:
+      operationId: dapiIntradayTickRequest
+      summary: Request intraday tick data
+      description: >-
+        Retrieves tick-level intraday data through the local Bloomberg
+        Terminal.
+      tags:
+        - Reference Data
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IntradayTickRequest'
+      responses:
+        '200':
+          description: Intraday tick data retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntradayTickResponse'
+  /blp/mktdata/Subscribe:
+    post:
+      operationId: dapiMarketDataSubscribe
+      summary: Subscribe to real-time market data
+      description: >-
+        Creates real-time market data subscriptions through the local
+        Bloomberg Terminal. This is the programmatic equivalent of the
+        BRT()/RTD() functions in Excel for live data feeds.
+      tags:
+        - Market Data
+        - Excel Integration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MarketDataSubscription'
+            examples:
+              livePortfolio:
+                summary: Live portfolio monitoring subscription
+                value:
+                  subscriptions:
+                    - security: IBM US Equity
+                      fields:
+                        - LAST_PRICE
+                        - BID
+                        - ASK
+                        - VOLUME
+                        - LAST_TRADE_TIME
+                      correlationId: 1
+      responses:
+        '200':
+          description: Subscription created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionResponse'
+  /blp/apiflds/FieldInfoRequest:
+    post:
+      operationId: dapiFieldInfoRequest
+      summary: Get field metadata
+      description: >-
+        Retrieves metadata about Bloomberg data fields through the local
+        Terminal. Equivalent to FLDS<GO> on the Terminal.
+      tags:
+        - Field Information
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FieldInfoRequest'
+      responses:
+        '200':
+          description: Field information retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FieldInfoResponse'
+  /blp/apiflds/FieldSearchRequest:
+    post:
+      operationId: dapiFieldSearchRequest
+      summary: Search for Bloomberg fields
+      description: >-
+        Searches for Bloomberg fields matching a keyword through the local
+        Terminal.
+      tags:
+        - Field Information
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FieldSearchRequest'
+      responses:
+        '200':
+          description: Field search results returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FieldSearchResponse'
+  /blp/instruments/instrumentListRequest:
+    post:
+      operationId: dapiInstrumentListRequest
+      summary: Search for instruments
+      description: >-
+        Searches for Bloomberg instruments through the local Terminal
+        with optional yellow key filtering.
+      tags:
+        - Instruments
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InstrumentListRequest'
+      responses:
+        '200':
+          description: Instrument search results returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstrumentListResponse'
+components:
+  schemas:
+    ReferenceDataRequest:
+      type: object
+      required:
+        - securities
+        - fields
+      properties:
+        securities:
+          type: array
+          items:
+            type: string
+          minItems: 1
+        fields:
+          type: array
+          items:
+            type: string
+          minItems: 1
+        overrides:
+          type: array
+          items:
+            type: object
+            properties:
+              fieldId:
+                type: string
+              value:
+                type: string
+        returnEids:
+          type: boolean
+        returnFormattedValue:
+          type: boolean
+    ReferenceDataResponse:
+      type: object
+      properties:
+        securityData:
+          type: array
+          items:
+            type: object
+            properties:
+              security:
+                type: string
+              eidData:
+                type: array
+                items:
+                  type: integer
+              sequenceNumber:
+                type: integer
+              fieldExceptions:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    fieldId:
+                      type: string
+                    errorInfo:
+                      type: object
+                      properties:
+                        source:
+                          type: string
+                        code:
+                          type: integer
+                        category:
+                          type: string
+                        message:
+                          type: string
+              fieldData:
+                type: object
+                additionalProperties: true
+    HistoricalDataRequest:
+      type: object
+      required:
+        - securities
+        - fields
+        - startDate
+        - endDate
+      properties:
+        securities:
+          type: array
+          items:
+            type: string
+        fields:
+          type: array
+          items:
+            type: string
+        startDate:
+          type: string
+          pattern: '^\d{8}$'
+        endDate:
+          type: string
+          pattern: '^\d{8}$'
+        periodicitySelection:
+          type: string
+          enum:
+            - DAILY
+            - WEEKLY
+            - MONTHLY
+            - QUARTERLY
+            - SEMI_ANNUALLY
+            - YEARLY
+        currency:
+          type: string
+        adjustmentNormal:
+          type: boolean
+        adjustmentAbnormal:
+          type: boolean
+        adjustmentSplit:
+          type: boolean
+    HistoricalDataResponse:
+      type: object
+      properties:
+        securityData:
+          type: array
+          items:
+            type: object
+            properties:
+              security:
+                type: string
+              sequenceNumber:
+                type: integer
+              fieldData:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    date:
+                      type: string
+                      format: date
+                  additionalProperties: true
+    IntradayBarRequest:
+      type: object
+      required:
+        - security
+        - eventType
+        - startDateTime
+        - endDateTime
+        - interval
+      properties:
+        security:
+          type: string
+        eventType:
+          type: string
+          enum:
+            - TRADE
+            - BID
+            - ASK
+        startDateTime:
+          type: string
+          format: date-time
+        endDateTime:
+          type: string
+          format: date-time
+        interval:
+          type: integer
+          minimum: 1
+          maximum: 1440
+    IntradayBarResponse:
+      type: object
+      properties:
+        barData:
+          type: object
+          properties:
+            barTickData:
+              type: array
+              items:
+                type: object
+                properties:
+                  time:
+                    type: string
+                    format: date-time
+                  open:
+                    type: number
+                  high:
+                    type: number
+                  low:
+                    type: number
+                  close:
+                    type: number
+                  volume:
+                    type: integer
+                  numEvents:
+                    type: integer
+    IntradayTickRequest:
+      type: object
+      required:
+        - security
+        - startDateTime
+        - endDateTime
+      properties:
+        security:
+          type: string
+        eventTypes:
+          type: array
+          items:
+            type: string
+            enum:
+              - TRADE
+              - BID
+              - ASK
+        startDateTime:
+          type: string
+          format: date-time
+        endDateTime:
+          type: string
+          format: date-time
+        includeConditionCodes:
+          type: boolean
+        includeExchangeCodes:
+          type: boolean
+    IntradayTickResponse:
+      type: object
+      properties:
+        tickData:
+          type: object
+          properties:
+            tickData:
+              type: array
+              items:
+                type: object
+                properties:
+                  time:
+                    type: string
+                    format: date-time
+                  type:
+                    type: string
+                  value:
+                    type: number
+                  size:
+                    type: integer
+    MarketDataSubscription:
+      type: object
+      required:
+        - subscriptions
+      properties:
+        subscriptions:
+          type: array
+          items:
+            type: object
+            required:
+              - security
+              - fields
+              - correlationId
+            properties:
+              security:
+                type: string
+              fields:
+                type: array
+                items:
+                  type: string
+              correlationId:
+                type: integer
+    SubscriptionResponse:
+      type: object
+      properties:
+        subscriptions:
+          type: array
+          items:
+            type: object
+            properties:
+              correlationId:
+                type: integer
+              status:
+                type: string
+    FieldInfoRequest:
+      type: object
+      properties:
+        id:
+          type: array
+          items:
+            type: string
+        returnFieldDocumentation:
+          type: string
+    FieldInfoResponse:
+      type: object
+      properties:
+        fieldData:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              fieldInfo:
+                type: object
+                properties:
+                  mnemonic:
+                    type: string
+                  description:
+                    type: string
+                  datatype:
+                    type: string
+                  documentation:
+                    type: string
+    FieldSearchRequest:
+      type: object
+      properties:
+        searchSpec:
+          type: string
+        returnFieldDocumentation:
+          type: string
+    FieldSearchResponse:
+      type: object
+      properties:
+        fieldData:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              fieldInfo:
+                type: object
+                properties:
+                  mnemonic:
+                    type: string
+                  description:
+                    type: string
+                  datatype:
+                    type: string
+    InstrumentListRequest:
+      type: object
+      required:
+        - query
+      properties:
+        query:
+          type: string
+        yellowKeyFilter:
+          type: string
+          enum:
+            - YK_FILTER_NONE
+            - YK_FILTER_CMDT
+            - YK_FILTER_EQUITY
+            - YK_FILTER_MUNI
+            - YK_FILTER_PRFD
+            - YK_FILTER_CLNT
+            - YK_FILTER_MMKT
+            - YK_FILTER_GOVT
+            - YK_FILTER_CORP
+            - YK_FILTER_INDX
+            - YK_FILTER_CURR
+            - YK_FILTER_MTGE
+        maxResults:
+          type: integer
+    InstrumentListResponse:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            type: object
+            properties:
+              security:
+                type: string
+              description:
+                type: string

@@ -1,0 +1,147 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/api-search/bloomberg-terminal/blob/main/json-schema/bloomberg-terminal-security-schema.json",
+  "title": "Bloomberg Security",
+  "description": "Represents a Bloomberg security identifier and its associated metadata. Securities are the fundamental entity in Bloomberg data services, identified by a ticker symbol combined with a market sector (yellow key) and exchange code.",
+  "type": "object",
+  "required": [
+    "security"
+  ],
+  "properties": {
+    "security": {
+      "type": "string",
+      "description": "Full Bloomberg security identifier in the format '{TICKER} {EXCHANGE} {YELLOW_KEY}' (e.g., 'IBM US Equity', 'EURUSD Curncy', 'T 2.5 05/15/24 Govt').",
+      "examples": [
+        "IBM US Equity",
+        "AAPL US Equity",
+        "EURUSD Curncy",
+        "SPX Index",
+        "T 2.5 05/15/24 Govt"
+      ]
+    },
+    "ticker": {
+      "type": "string",
+      "description": "Security ticker symbol.",
+      "examples": [
+        "IBM",
+        "AAPL",
+        "EURUSD"
+      ]
+    },
+    "exchange": {
+      "type": "string",
+      "description": "Exchange code where the security is listed.",
+      "examples": [
+        "US",
+        "LN",
+        "JP",
+        "GR"
+      ]
+    },
+    "yellowKey": {
+      "type": "string",
+      "description": "Bloomberg market sector classification (yellow key).",
+      "enum": [
+        "Govt",
+        "Corp",
+        "Mtge",
+        "M-Mkt",
+        "Muni",
+        "Pfd",
+        "Equity",
+        "Cmdty",
+        "Index",
+        "Curncy"
+      ]
+    },
+    "name": {
+      "type": "string",
+      "description": "Name of the company or instrument (Bloomberg field: NAME).",
+      "examples": [
+        "INTL BUSINESS MACHINES CORP",
+        "APPLE INC"
+      ]
+    },
+    "longCompanyName": {
+      "type": "string",
+      "description": "Full company name (Bloomberg field: LONG_COMP_NAME)."
+    },
+    "isin": {
+      "type": "string",
+      "description": "International Securities Identification Number.",
+      "pattern": "^[A-Z]{2}[A-Z0-9]{9}[0-9]$"
+    },
+    "cusip": {
+      "type": "string",
+      "description": "Committee on Uniform Securities Identification Procedures identifier.",
+      "pattern": "^[A-Z0-9]{9}$"
+    },
+    "sedol": {
+      "type": "string",
+      "description": "Stock Exchange Daily Official List identifier.",
+      "pattern": "^[A-Z0-9]{7}$"
+    },
+    "figi": {
+      "type": "string",
+      "description": "Financial Instrument Global Identifier (OpenFIGI).",
+      "pattern": "^BBG[A-Z0-9]{9}$"
+    },
+    "bbGlobal": {
+      "type": "string",
+      "description": "Bloomberg Global Identifier (BB_GLOBAL)."
+    },
+    "idBbCompany": {
+      "type": "string",
+      "description": "Bloomberg company identifier (ID_BB_COMPANY)."
+    },
+    "idBbSecurity": {
+      "type": "string",
+      "description": "Bloomberg security identifier (ID_BB_SECURITY)."
+    },
+    "country": {
+      "type": "string",
+      "description": "Country of domicile (ISO 3166-1 alpha-2 code).",
+      "pattern": "^[A-Z]{2}$"
+    },
+    "currency": {
+      "type": "string",
+      "description": "Trading currency (ISO 4217 code).",
+      "pattern": "^[A-Z]{3}$"
+    },
+    "securityType": {
+      "type": "string",
+      "description": "Bloomberg security type classification.",
+      "examples": [
+        "Common Stock",
+        "ADR",
+        "ETF",
+        "REIT",
+        "Convertible",
+        "Corporate Bond"
+      ]
+    },
+    "gicsSectorName": {
+      "type": "string",
+      "description": "GICS sector classification name.",
+      "examples": [
+        "Information Technology",
+        "Health Care",
+        "Financials",
+        "Consumer Discretionary"
+      ]
+    },
+    "gicsIndustryGroupName": {
+      "type": "string",
+      "description": "GICS industry group classification name."
+    },
+    "gicsIndustryName": {
+      "type": "string",
+      "description": "GICS industry classification name."
+    },
+    "gicsSubIndustryName": {
+      "type": "string",
+      "description": "GICS sub-industry classification name."
+    }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,698 @@
+openapi: 3.1.0
+info:
+  title: Bloomberg Terminal Connect API
+  description: >-
+    Bloomberg Terminal Connect enables developers to create collaborative
+    workflows between third-party applications and the Bloomberg Terminal.
+    The API provides operations for managing Bloomberg Launchpad groups and
+    their security contexts, creating and modifying worksheets, searching
+    for securities, and executing Bloomberg Terminal commands (mnemonics)
+    programmatically. Terminal Connect uses a bridge-based architecture
+    where clients communicate with the Bloomberg Terminal through the
+    Bloomberg Bridge component. The underlying protocol supports both
+    REST-style and GraphQL interactions via the graph.bloomberg.com
+    endpoint.
+  version: 3.0.0
+  contact:
+    name: Bloomberg Terminal Connect Support
+    url: https://github.com/bloomberg/terminal-connect
+  license:
+    name: Bloomberg Professional Services
+    url: https://www.bloomberg.com/notices/tos/
+  x-logo:
+    url: https://www.bloomberg.com/company/wp-content/uploads/sites/2/2021/09/bloomberg-logo-1.png
+servers:
+  - url: https://graph.bloomberg.com
+    description: Bloomberg Terminal Connect GraphQL and REST endpoint
+tags:
+  - name: Groups
+    description: >-
+      Operations for managing Bloomberg Launchpad component groups and
+      their security context. Groups allow synchronization of securities
+      across Bloomberg Terminal panels and third-party applications.
+  - name: Worksheets
+    description: >-
+      Operations for creating, reading, and modifying Bloomberg Terminal
+      worksheets containing lists of securities.
+  - name: Securities
+    description: >-
+      Operations for searching and looking up Bloomberg security
+      identifiers with typeahead support.
+  - name: Terminal Commands
+    description: >-
+      Operations for executing Bloomberg Terminal functions (mnemonics)
+      on specific panels.
+  - name: Connection
+    description: >-
+      Operations for managing the connection to the Bloomberg Terminal
+      via the Bloomberg Bridge.
+paths:
+  /groups:
+    get:
+      operationId: getAllGroups
+      summary: Retrieve all Launchpad groups
+      description: >-
+        Retrieves a list of all Bloomberg Launchpad component groups and
+        their current security context. Groups are used to synchronize
+        securities across Bloomberg Terminal panels and external
+        applications. Each group contains a name, identifier, and the
+        currently active security.
+      tags:
+        - Groups
+      responses:
+        '200':
+          description: List of all Launchpad groups retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  groups:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/LaunchpadGroup'
+              examples:
+                groupList:
+                  summary: List of Launchpad groups
+                  value:
+                    groups:
+                      - name: Group-A
+                        id: group-a
+                        value: IBM US Equity
+                        color: red
+                      - name: Group-B
+                        id: group-b
+                        value: AAPL US Equity
+                        color: blue
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '503':
+          $ref: '#/components/responses/BridgeUnavailable'
+      security:
+        - apiKey: []
+  /groups/{groupName}:
+    get:
+      operationId: getGroupContext
+      summary: Get group security context
+      description: >-
+        Retrieves the current security context of a specific Launchpad
+        group, including the active security and group metadata.
+      tags:
+        - Groups
+      parameters:
+        - name: groupName
+          in: path
+          required: true
+          description: >-
+            The name of the Launchpad group to retrieve context for.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Group context retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LaunchpadGroup'
+              examples:
+                groupContext:
+                  summary: Group security context
+                  value:
+                    name: Group-A
+                    id: group-a
+                    value: IBM US Equity
+                    color: red
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '503':
+          $ref: '#/components/responses/BridgeUnavailable'
+      security:
+        - apiKey: []
+    put:
+      operationId: setGroupContext
+      summary: Set group security context
+      description: >-
+        Updates the security context of a specific Launchpad group. This
+        changes the active security for all Bloomberg Terminal components
+        linked to this group, enabling synchronized navigation across
+        panels.
+      tags:
+        - Groups
+      parameters:
+        - name: groupName
+          in: path
+          required: true
+          description: The name of the Launchpad group to update.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GroupContextUpdate'
+            examples:
+              setContext:
+                summary: Set group to IBM
+                value:
+                  value: IBM US Equity
+      responses:
+        '200':
+          description: Group context updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LaunchpadGroup'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '503':
+          $ref: '#/components/responses/BridgeUnavailable'
+      security:
+        - apiKey: []
+  /worksheets:
+    get:
+      operationId: getAllWorksheets
+      summary: Retrieve all worksheets
+      description: >-
+        Retrieves a list of all Bloomberg Terminal worksheets, including
+        their names, identifiers, and securities.
+      tags:
+        - Worksheets
+      responses:
+        '200':
+          description: List of worksheets retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  worksheets:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Worksheet'
+              examples:
+                worksheetList:
+                  summary: List of worksheets
+                  value:
+                    worksheets:
+                      - id: ws-001
+                        name: US Tech Watchlist
+                        securities:
+                          - AAPL US Equity
+                          - MSFT US Equity
+                          - GOOGL US Equity
+                      - id: ws-002
+                        name: Fixed Income
+                        securities:
+                          - T 2.5 05/15/24 Govt
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '503':
+          $ref: '#/components/responses/BridgeUnavailable'
+      security:
+        - apiKey: []
+    post:
+      operationId: createWorksheet
+      summary: Create a new worksheet
+      description: >-
+        Creates a new Bloomberg Terminal worksheet with the specified name
+        and list of securities. Unresolvable securities will be removed
+        from the list during creation.
+      tags:
+        - Worksheets
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorksheetCreate'
+            examples:
+              createWorksheet:
+                summary: Create a tech watchlist
+                value:
+                  name: US Tech Watchlist
+                  securities:
+                    - AAPL US Equity
+                    - MSFT US Equity
+                    - GOOGL US Equity
+                    - AMZN US Equity
+      responses:
+        '201':
+          description: Worksheet created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Worksheet'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '503':
+          $ref: '#/components/responses/BridgeUnavailable'
+      security:
+        - apiKey: []
+  /worksheets/{worksheetId}:
+    get:
+      operationId: getWorksheet
+      summary: Get worksheet details
+      description: >-
+        Retrieves the details of a specific Bloomberg Terminal worksheet,
+        including its name, identifier, and list of securities.
+      tags:
+        - Worksheets
+      parameters:
+        - name: worksheetId
+          in: path
+          required: true
+          description: The unique identifier of the worksheet.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Worksheet details retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Worksheet'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '503':
+          $ref: '#/components/responses/BridgeUnavailable'
+      security:
+        - apiKey: []
+    put:
+      operationId: replaceWorksheet
+      summary: Replace worksheet securities
+      description: >-
+        Replaces the entire list of securities in an existing worksheet
+        with a new list. This is a full replacement; securities not
+        included in the new list will be removed.
+      tags:
+        - Worksheets
+      parameters:
+        - name: worksheetId
+          in: path
+          required: true
+          description: The unique identifier of the worksheet to update.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorksheetUpdate'
+            examples:
+              replaceSecurities:
+                summary: Replace worksheet securities
+                value:
+                  securities:
+                    - TSLA US Equity
+                    - NVDA US Equity
+                    - META US Equity
+      responses:
+        '200':
+          description: Worksheet securities replaced successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Worksheet'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '503':
+          $ref: '#/components/responses/BridgeUnavailable'
+      security:
+        - apiKey: []
+  /securities/search:
+    get:
+      operationId: searchSecurities
+      summary: Search for Bloomberg securities
+      description: >-
+        Searches for Bloomberg securities using a typeahead-style query.
+        Returns matching security identifiers with their descriptions.
+        Results are typically returned within 120-150ms via the Bloomberg
+        Bridge, which uses the Bloomberg Desktop API (DAPI) for lookups.
+      tags:
+        - Securities
+      parameters:
+        - name: query
+          in: query
+          required: true
+          description: >-
+            Search term for finding securities (e.g., company name, ticker,
+            ISIN, or CUSIP).
+          schema:
+            type: string
+        - name: maxResults
+          in: query
+          required: false
+          description: Maximum number of results to return.
+          schema:
+            type: integer
+            default: 10
+            maximum: 50
+        - name: yellowKeyFilter
+          in: query
+          required: false
+          description: >-
+            Filter results by Bloomberg market sector (yellow key).
+          schema:
+            type: string
+            enum:
+              - Govt
+              - Corp
+              - Mtge
+              - M-Mkt
+              - Muni
+              - Pfd
+              - Equity
+              - Cmdty
+              - Index
+              - Curncy
+      responses:
+        '200':
+          description: Security search results returned successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SecuritySearchResult'
+              examples:
+                searchResults:
+                  summary: Search results for IBM
+                  value:
+                    results:
+                      - security: IBM US Equity
+                        description: International Business Machines Corp
+                        yellowKey: Equity
+                        ticker: IBM
+                        exchange: US
+                      - security: IBM LN Equity
+                        description: International Business Machines Corp
+                        yellowKey: Equity
+                        ticker: IBM
+                        exchange: LN
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '503':
+          $ref: '#/components/responses/BridgeUnavailable'
+      security:
+        - apiKey: []
+  /terminal/command:
+    post:
+      operationId: runTerminalCommand
+      summary: Execute a Bloomberg Terminal command
+      description: >-
+        Sends a command (mnemonic) to the Bloomberg Terminal to execute
+        a specific function on a designated panel. This allows external
+        applications to drive Bloomberg Terminal navigation and analysis
+        programmatically. Common mnemonics include DES (Description),
+        GP (Graph), FA (Financial Analysis), and OMON (Option Monitor).
+      tags:
+        - Terminal Commands
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TerminalCommand'
+            examples:
+              openDescription:
+                summary: Open DES function for IBM
+                value:
+                  mnemonic: DES
+                  securities:
+                    - IBM US Equity
+                  panel: 1
+                  tails: ''
+              openGraph:
+                summary: Open GP function for AAPL
+                value:
+                  mnemonic: GP
+                  securities:
+                    - AAPL US Equity
+                  panel: 2
+                  tails: ''
+      responses:
+        '200':
+          description: Terminal command executed successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    description: Whether the command was executed successfully.
+                  message:
+                    type: string
+                    description: Status message from the Terminal.
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '503':
+          $ref: '#/components/responses/BridgeUnavailable'
+      security:
+        - apiKey: []
+  /connection/status:
+    get:
+      operationId: getConnectionStatus
+      summary: Check Bloomberg Bridge connection status
+      description: >-
+        Checks the current connection status between the third-party
+        application and the Bloomberg Terminal via the Bloomberg Bridge
+        component. Returns connectivity details and the Terminal session
+        state.
+      tags:
+        - Connection
+      responses:
+        '200':
+          description: Connection status retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectionStatus'
+              examples:
+                connected:
+                  summary: Connected to Bloomberg Terminal
+                  value:
+                    connected: true
+                    terminalVersion: '2025.1'
+                    bridgeVersion: '3.0.0'
+                    sessionActive: true
+        '503':
+          $ref: '#/components/responses/BridgeUnavailable'
+      security:
+        - apiKey: []
+components:
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      in: header
+      name: X-Bloomberg-Api-Key
+      description: >-
+        Bloomberg Terminal Connect API key. Origins (hostname/port) must
+        be whitelisted by Bloomberg for the API key to function.
+  responses:
+    BadRequest:
+      description: Bad request - invalid parameters or malformed request body.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unauthorized:
+      description: >-
+        Unauthorized - missing or invalid API key, or origin not whitelisted.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: The requested resource was not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    BridgeUnavailable:
+      description: >-
+        Bloomberg Bridge is not available. The Bloomberg Terminal may not
+        be running or the Bridge component is not connected.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+  schemas:
+    ErrorResponse:
+      type: object
+      description: Error response from the Terminal Connect API.
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              description: Error code.
+            message:
+              type: string
+              description: Human-readable error message.
+    LaunchpadGroup:
+      type: object
+      description: >-
+        A Bloomberg Launchpad component group that synchronizes security
+        context across Terminal panels and external applications.
+      properties:
+        name:
+          type: string
+          description: Display name of the Launchpad group.
+        id:
+          type: string
+          description: Unique identifier for the group.
+        value:
+          type: string
+          description: >-
+            The current security context value (Bloomberg security
+            identifier) for the group.
+        color:
+          type: string
+          description: The color assigned to this group in Launchpad.
+    GroupContextUpdate:
+      type: object
+      description: Request body for updating a group's security context.
+      required:
+        - value
+      properties:
+        value:
+          type: string
+          description: >-
+            The new security identifier to set as the group context
+            (e.g., 'IBM US Equity').
+    Worksheet:
+      type: object
+      description: >-
+        A Bloomberg Terminal worksheet containing a named list of
+        securities.
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the worksheet.
+        name:
+          type: string
+          description: Display name of the worksheet.
+        securities:
+          type: array
+          description: List of Bloomberg security identifiers in the worksheet.
+          items:
+            type: string
+    WorksheetCreate:
+      type: object
+      description: Request body for creating a new worksheet.
+      required:
+        - name
+        - securities
+      properties:
+        name:
+          type: string
+          description: Display name for the new worksheet.
+        securities:
+          type: array
+          description: >-
+            List of Bloomberg security identifiers. Unresolvable
+            securities will be removed during creation.
+          items:
+            type: string
+          minItems: 1
+    WorksheetUpdate:
+      type: object
+      description: Request body for replacing worksheet securities.
+      required:
+        - securities
+      properties:
+        securities:
+          type: array
+          description: New list of Bloomberg security identifiers.
+          items:
+            type: string
+    SecuritySearchResult:
+      type: object
+      description: A security search result from the Bloomberg lookup service.
+      properties:
+        security:
+          type: string
+          description: Full Bloomberg security identifier.
+        description:
+          type: string
+          description: Company or instrument description.
+        yellowKey:
+          type: string
+          description: Bloomberg market sector classification.
+        ticker:
+          type: string
+          description: Security ticker symbol.
+        exchange:
+          type: string
+          description: Exchange code where the security is listed.
+    TerminalCommand:
+      type: object
+      description: >-
+        A command to execute on the Bloomberg Terminal. Commands use
+        Bloomberg mnemonics (e.g., DES, GP, FA) with associated
+        securities and panel targeting.
+      required:
+        - mnemonic
+      properties:
+        mnemonic:
+          type: string
+          description: >-
+            Bloomberg Terminal function mnemonic (e.g., DES for
+            Description, GP for Graph, FA for Financial Analysis).
+        securities:
+          type: array
+          description: Securities to pass to the Terminal function.
+          items:
+            type: string
+        panel:
+          type: integer
+          description: >-
+            Bloomberg Terminal panel number (1-4) to execute the
+            command on.
+          minimum: 1
+          maximum: 4
+        tails:
+          type: string
+          description: >-
+            Additional tail arguments for the mnemonic command.
+    ConnectionStatus:
+      type: object
+      description: Status of the Bloomberg Bridge connection.
+      properties:
+        connected:
+          type: boolean
+          description: Whether the Bridge is connected to the Terminal.
+        terminalVersion:
+          type: string
+          description: Version of the connected Bloomberg Terminal.
+        bridgeVersion:
+          type: string
+          description: Version of the Bloomberg Bridge component.
+        sessionActive:
+          type: boolean
+          description: Whether there is an active Bloomberg session.

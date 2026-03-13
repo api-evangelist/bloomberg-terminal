@@ -3,73 +3,201 @@ description: Bloomberg Terminal is a computer software system provided by Bloomb
 image: https://www.bloomberg.com/company/wp-content/uploads/sites/2/2021/09/bloomberg-logo-1.png
 url: https://www.bloomberg.com/professional/solution/bloomberg-terminal/
 created: '2024'
-modified: '2024'
+modified: '2026-03-04'
 specificationVersion: '0.18'
 apis:
 - name: Bloomberg Data API
-  description: Provides programmatic access to Bloomberg data including real-time market data, reference data, historical data, and pricing information.
+  description: Provides programmatic access to Bloomberg data including real-time market data, reference data, historical data, and pricing information through the BLPAPI protocol.
   image: https://www.bloomberg.com/company/wp-content/uploads/sites/2/2021/09/bloomberg-logo-1.png
   humanURL: https://www.bloomberg.com/professional/support/api-library/
   baseURL: https://api.bloomberg.com
   tags:
-  - financial data
-  - market data
-  - real-time
-  - pricing
+  - Financial Data
+  - Market Data
+  - Real-Time
+  - Pricing
   properties:
   - type: Documentation
     url: https://www.bloomberg.com/professional/support/api-library/
   - type: Authentication
     url: https://www.bloomberg.com/professional/support/api-library/
+  - type: Reference
+    url: https://bloomberg.github.io/blpapi-docs/
+  - type: SDKs
+    url: https://bloomberg.github.io/blpapi-docs/
+  - type: Change Log
+    url: https://github.com/msitt/blpapi-python/blob/master/changelog.txt
+  - type: OpenAPI
+    url: openapi/bloomberg-terminal-data-api-openapi.yml
   contact:
   - FN: Bloomberg API Support
     email: apisupport@bloomberg.net
 - name: Bloomberg SAPI
-  description: Server API (SAPI) providing server-side access to Bloomberg data for institutional clients and enterprise applications.
+  description: Server API (SAPI) providing server-side access to Bloomberg data for institutional clients and enterprise applications. The SDK supports C++, .NET Framework, VBA via COM Data Control, Java, and Python.
   image: https://www.bloomberg.com/company/wp-content/uploads/sites/2/2021/09/bloomberg-logo-1.png
-  humanURL: https://www.bloomberg.com/professional/support/api-library/
+  humanURL: https://www.bloomberg.com/professional/products/data/data-connectivity/server-api/
   baseURL: https://api.bloomberg.com/sapi
   tags:
-  - server API
-  - enterprise
-  - institutional
-  - data feeds
+  - Server API
+  - Enterprise
+  - Institutional
+  - Data Feeds
   properties:
   - type: Documentation
     url: https://www.bloomberg.com/professional/support/api-library/
   - type: Getting Started
-    url: https://www.bloomberg.com/professional/support/api-library/
+    url: https://www.bloomberg.com/professional/products/data/data-connectivity/server-api/
+  - type: Reference
+    url: https://bloomberg.github.io/blpapi-docs/
+  - type: SDKs
+    url: https://bloomberg.github.io/blpapi-docs/
+  - type: OpenAPI
+    url: openapi/bloomberg-terminal-sapi-openapi.yml
 - name: Bloomberg Desktop API
-  description: Desktop API enabling custom applications to integrate directly with Bloomberg Terminal for accessing market data, executing functions, and building custom workflows.
+  description: Desktop API enabling custom applications to integrate directly with Bloomberg Terminal for accessing market data, executing functions, and building custom workflows on the desktop.
   image: https://www.bloomberg.com/company/wp-content/uploads/sites/2/2021/09/bloomberg-logo-1.png
   humanURL: https://www.bloomberg.com/professional/support/api-library/
   tags:
-  - desktop
-  - terminal integration
-  - custom applications
-  - excel
+  - Desktop
+  - Terminal Integration
+  - Custom Applications
+  - Excel
   properties:
   - type: Documentation
     url: https://www.bloomberg.com/professional/support/api-library/
-  - type: SDK
+  - type: SDKs
     url: https://www.bloomberg.com/professional/support/api-library/
+  - type: Reference
+    url: https://bloomberg.github.io/blpapi-docs/
+  - type: Getting Started
+    url: https://bloomberg.github.io/blpapi-docs/
+  - type: OpenAPI
+    url: openapi/bloomberg-terminal-desktop-api-openapi.yml
 - name: Bloomberg BPIPE
-  description: Bloomberg Pipe (BPIPE) delivers real-time and reference data directly to client applications for systematic trading, quantitative analysis, and automated workflows.
+  description: Bloomberg Market Data Feed (B-PIPE) delivers real-time and reference data from more than 330 exchanges and 5,000 pricing contributors globally, covering 35 million instruments across all asset classes.
   image: https://www.bloomberg.com/company/wp-content/uploads/sites/2/2021/09/bloomberg-logo-1.png
-  humanURL: https://www.bloomberg.com/professional/product/bpipe/
+  humanURL: https://www.bloomberg.com/professional/products/data/enterprise-catalog/real-time-data-feed/
   tags:
-  - real-time data
-  - streaming
-  - systematic trading
-  - quantitative
+  - Real-Time Data
+  - Streaming
+  - Systematic Trading
+  - Market Data Feed
   properties:
   - type: Documentation
-    url: https://www.bloomberg.com/professional/product/bpipe/
+    url: https://www.bloomberg.com/professional/products/data/enterprise-catalog/real-time-data-feed/
   - type: Product Info
     url: https://www.bloomberg.com/professional/product/bpipe/
+  - type: Getting Started
+    url: https://www.bloomberg.com/professional/support/api-library/
+  - type: Reference
+    url: https://bloomberg.github.io/blpapi-docs/
+  - type: OpenAPI
+    url: openapi/bloomberg-terminal-bpipe-openapi.yml
+- name: Bloomberg Terminal Connect API
+  description: Terminal Connect enables developers to create collaborative workflows between third-party systems and the Bloomberg Terminal using a GraphQL API, allowing applications to launch Terminal functions and synchronize with Bloomberg Launchpad.
+  image: https://www.bloomberg.com/company/wp-content/uploads/sites/2/2021/09/bloomberg-logo-1.png
+  humanURL: https://github.com/bloomberg/terminal-connect
+  baseURL: https://graph.bloomberg.com
+  tags:
+  - Terminal Integration
+  - GraphQL
+  - Workflow Automation
+  - Launchpad
+  properties:
+  - type: Documentation
+    url: https://github.com/bloomberg/terminal-connect
+  - type: GitHubRepository
+    url: https://github.com/bloomberg/terminal-connect
+  - type: Getting Started
+    url: https://github.com/bloomberg/terminal-connect/blob/main/README.md
+  - type: OpenAPI
+    url: openapi/bloomberg-terminal-terminal-connect-api-openapi.yml
+- name: Bloomberg Data License API
+  description: The Hypermedia API (HAPI) gives firms programmatic access to Data License content with request-response and subscription-based services, covering reference, pricing, regulatory, and alternative data.
+  image: https://www.bloomberg.com/company/wp-content/uploads/sites/2/2021/09/bloomberg-logo-1.png
+  humanURL: https://www.bloomberg.com/professional/products/data/data-management/data-license/
+  tags:
+  - Data License
+  - Reference Data
+  - Regulatory Data
+  - Alternative Data
+  properties:
+  - type: Documentation
+    url: https://www.bloomberg.com/professional/products/data/data-management/data-license/
+  - type: Getting Started
+    url: https://www.bloomberg.com/professional/solutions/asset-management/developer/
+  - type: Reference
+    url: https://bloomberg.github.io/blpapi-docs/
+  - type: OpenAPI
+    url: openapi/bloomberg-terminal-data-license-api-openapi.yml
+- name: Bloomberg BLPAPI HTTP API
+  description: The Bloomberg HTTP API makes the Open API available via HTTP and WebSockets, allowing clients to access reference and historical request-response data as well as make subscriptions for live data.
+  image: https://www.bloomberg.com/company/wp-content/uploads/sites/2/2021/09/bloomberg-logo-1.png
+  humanURL: https://github.com/bloomberg/blpapi-http
+  tags:
+  - HTTP API
+  - WebSockets
+  - REST
+  - Real-Time Data
+  properties:
+  - type: Documentation
+    url: https://github.com/bloomberg/blpapi-http/blob/develop/doc/http-api-guide.md
+  - type: GitHubRepository
+    url: https://github.com/bloomberg/blpapi-http
+  - type: Getting Started
+    url: https://github.com/bloomberg/blpapi-http/blob/develop/doc/http-api-guide.md
+  - type: OpenAPI
+    url: openapi/bloomberg-terminal-blpapi-http-api-openapi.yml
+common:
+- type: Portal
+  url: https://www.bloomberg.com/professional/
+- type: Developer Portal
+  url: https://developer.bloomberg.com/
+- type: Documentation
+  url: https://www.bloomberg.com/professional/support/api-library/
+- type: Getting Started
+  url: https://www.bloomberg.com/professional/solutions/asset-management/developer/
+- type: Authentication
+  url: https://bba.bloomberg.net/
+- type: Blog
+  url: https://www.bloomberg.com/professional/blog/category/technology/
+- type: Status
+  url: https://service.bloomberg.com/
+- type: Support
+  url: https://www.bloomberg.com/professional/support/
+- type: Terms of Service
+  url: https://www.bloomberg.com/notices/tos/
+- type: Privacy Policy
+  url: https://www.bloomberg.com/notices/
+- type: GitHub Organization
+  url: https://github.com/bloomberg
+- type: Website
+  url: https://www.bloomberg.com/
+- type: Login
+  url: https://bba.bloomberg.net/
+- type: Sign Up
+  url: https://www.bloomberg.com/professional/request-demo/
+- type: Contact
+  url: https://www.bloomberg.com/professional/contact-menu/
+- type: Support Phone Numbers
+  url: https://www.bloomberg.com/professional/support/support-numbers/
+- type: JSON-LD Context
+  url: json-ld/bloomberg-terminal-context.jsonld
+- type: JSONSchema
+  url: json-schema/bloomberg-terminal-security-schema.json
+- type: JSONSchema
+  url: json-schema/bloomberg-terminal-market-data-schema.json
+- type: JSONSchema
+  url: json-schema/bloomberg-terminal-historical-data-schema.json
+- type: JSONSchema
+  url: json-schema/bloomberg-terminal-field-schema.json
+- type: JSONSchema
+  url: json-schema/bloomberg-terminal-data-license-request-schema.json
+- type: JSONSchema
+  url: json-schema/bloomberg-terminal-worksheet-schema.json
 maintainers:
-- FN: Bloomberg L.P.
-  email: support@bloomberg.net
+- FN: Kin Lane
+  email: kin@apievangelist.com
 tags:
 - financial services
 - market data

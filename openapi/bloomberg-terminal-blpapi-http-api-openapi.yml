@@ -1,0 +1,789 @@
+openapi: 3.1.0
+info:
+  title: Bloomberg BLPAPI HTTP API
+  description: >-
+    The Bloomberg HTTP API makes the Bloomberg Open API (BLPAPI) available via
+    HTTP and WebSockets, allowing clients to access reference and historical
+    request-response data as well as make subscriptions for live market data.
+    The API wraps the BLPAPI protocol, providing RESTful access to the
+    //blp/refdata (Reference Data Service) and //blp/apiflds (API Field
+    Service). Subscription data is available via WebSockets, Socket.IO, or
+    long-polling.
+  version: 1.0.0
+  contact:
+    name: Bloomberg API Support
+    email: open-tech@bloomberg.net
+    url: https://github.com/bloomberg/blpapi-http
+  license:
+    name: Apache License 2.0
+    url: https://github.com/bloomberg/blpapi-http/blob/master/LICENSE
+  x-logo:
+    url: https://www.bloomberg.com/company/wp-content/uploads/sites/2/2021/09/bloomberg-logo-1.png
+servers:
+  - url: https://{host}
+    description: Bloomberg BLPAPI HTTP API server
+    variables:
+      host:
+        default: http-api-host
+        description: >-
+          The hostname of the BLPAPI HTTP API server. This is a self-hosted
+          service that connects to a Bloomberg BLPAPI endpoint.
+tags:
+  - name: Reference Data
+    description: >-
+      Operations for retrieving reference and current market data for
+      securities via the //blp/refdata service.
+  - name: Historical Data
+    description: >-
+      Operations for retrieving end-of-day historical market data over a date
+      range via the //blp/refdata service.
+  - name: Field Information
+    description: >-
+      Operations for querying metadata about Bloomberg data fields via the
+      //blp/apiflds service.
+  - name: Subscriptions
+    description: >-
+      Operations for managing real-time market data subscriptions via
+      long-polling HTTP.
+paths:
+  /request:
+    post:
+      operationId: postRequest
+      summary: Submit a BLPAPI request
+      description: >-
+        Submits a request to a Bloomberg Open API service. The namespace,
+        service, and request type are specified via query parameters, and the
+        request payload is sent as JSON in the body. Currently supports the
+        //blp/refdata service (for ReferenceDataRequest, HistoricalDataRequest,
+        IntradayBarRequest, and IntradayTickRequest) and the //blp/apiflds
+        service (for FieldInfoRequest and FieldSearchRequest).
+      tags:
+        - Reference Data
+        - Historical Data
+        - Field Information
+      parameters:
+        - name: ns
+          in: query
+          required: true
+          description: >-
+            The namespace for the service on which the request is being made.
+            Currently all services are in the 'blp' namespace.
+          schema:
+            type: string
+            enum:
+              - blp
+            default: blp
+        - name: service
+          in: query
+          required: true
+          description: >-
+            The Bloomberg service on which the request is being made. Currently
+            'refdata' and 'apiflds' are supported.
+          schema:
+            type: string
+            enum:
+              - refdata
+              - apiflds
+        - name: type
+          in: query
+          required: true
+          description: >-
+            The request type for the operation. For //blp/refdata, supported
+            types include ReferenceDataRequest, HistoricalDataRequest,
+            IntradayBarRequest, and IntradayTickRequest. For //blp/apiflds,
+            supported types include FieldInfoRequest and FieldSearchRequest.
+          schema:
+            type: string
+            enum:
+              - ReferenceDataRequest
+              - HistoricalDataRequest
+              - IntradayBarRequest
+              - IntradayTickRequest
+              - FieldInfoRequest
+              - FieldSearchRequest
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/ReferenceDataRequest'
+                - $ref: '#/components/schemas/HistoricalDataRequest'
+                - $ref: '#/components/schemas/IntradayBarRequest'
+                - $ref: '#/components/schemas/IntradayTickRequest'
+                - $ref: '#/components/schemas/FieldInfoRequest'
+                - $ref: '#/components/schemas/FieldSearchRequest'
+            examples:
+              referenceData:
+                summary: Reference data request for IBM and AAPL
+                value:
+                  securities:
+                    - IBM US Equity
+                    - AAPL US Equity
+                  fields:
+                    - PX_LAST
+                    - NAME
+                    - EPS_ANNUALIZED
+              historicalData:
+                summary: Historical data request for daily prices
+                value:
+                  securities:
+                    - IBM US Equity
+                    - AAPL US Equity
+                  fields:
+                    - PX_LAST
+                    - OPEN
+                  startDate: '20120101'
+                  endDate: '20120105'
+                  periodicitySelection: DAILY
+              fieldInfo:
+                summary: Field info request for NAME field
+                value:
+                  id:
+                    - NAME
+                  returnFieldDocumentation: 'true'
+      responses:
+        '200':
+          description: Successful response from the Bloomberg Open API.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlpapiResponse'
+              examples:
+                referenceDataResponse:
+                  summary: Reference data response
+                  value:
+                    status: 0
+                    message: OK
+                    data:
+                      - securityData:
+                          - security: IBM US Equity
+                            eidData: []
+                            fieldExceptions: []
+                            sequenceNumber: 0
+                            fieldData:
+                              PX_LAST: 158.42
+                              NAME: INTL BUSINESS MACHINES CORP
+                              EPS_ANNUALIZED: 15.06
+                historicalDataResponse:
+                  summary: Historical data response
+                  value:
+                    status: 0
+                    message: OK
+                    data:
+                      - securityData:
+                          security: IBM US Equity
+                          eidData: []
+                          sequenceNumber: 0
+                          fieldExceptions: []
+                          fieldData:
+                            - date: '2012-01-03T00:00:00.000Z'
+                              PX_LAST: 186.3
+                              OPEN: 186.73
+                fieldInfoResponse:
+                  summary: Field info response
+                  value:
+                    status: 0
+                    message: OK
+                    data:
+                      - fieldData:
+                          - id: DS002
+                            fieldInfo:
+                              mnemonic: NAME
+                              description: Name
+                              datatype: String
+                              ftype: Character
+        '400':
+          description: Bad request - invalid parameters or malformed request body.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlpapiErrorResponse'
+        '500':
+          description: Internal server error communicating with BLPAPI backend.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlpapiErrorResponse'
+      security:
+        - mutualTLS: []
+  /subscription:
+    post:
+      operationId: postSubscriptionAction
+      summary: Start or stop market data subscriptions
+      description: >-
+        Controls starting and stopping of market data subscriptions for
+        long-polling clients. The body of the POST contains subscription
+        definitions (for starting) or correlation IDs (for stopping).
+      tags:
+        - Subscriptions
+      parameters:
+        - name: action
+          in: query
+          required: true
+          description: >-
+            The subscription action to perform. Use 'start' to begin
+            subscriptions and 'stop' to end them.
+          schema:
+            type: string
+            enum:
+              - start
+              - stop
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/SubscribeRequest'
+                - $ref: '#/components/schemas/UnsubscribeRequest'
+            examples:
+              startSubscription:
+                summary: Start a market data subscription
+                value:
+                  - security: IBM US Equity
+                    correlationId: 1
+                    fields:
+                      - LAST_PRICE
+                      - BID
+                      - ASK
+              stopSubscription:
+                summary: Stop subscriptions by correlation ID
+                value:
+                  - 1
+                  - 2
+      responses:
+        '200':
+          description: Subscription action processed successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+        '400':
+          description: Bad request - invalid subscription parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlpapiErrorResponse'
+      security:
+        - mutualTLS: []
+    get:
+      operationId: getSubscriptionData
+      summary: Poll for subscription data
+      description: >-
+        Retrieves subscription data via long-polling. The pollid query
+        parameter acts as a logical counter and implicit acknowledgement
+        of previously received data. If a GET request with a specified
+        pollid fails, the pollid may be reused to recover the last set
+        of buffered subscription data.
+      tags:
+        - Subscriptions
+      parameters:
+        - name: pollid
+          in: query
+          required: true
+          description: >-
+            A logical counter that should be monotonically increasing.
+            Acts as an implicit acknowledgement of received data.
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Subscription data retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SubscriptionDataMessage'
+        '204':
+          description: No new data available for this poll cycle.
+      security:
+        - mutualTLS: []
+components:
+  securitySchemes:
+    mutualTLS:
+      type: mutualTLS
+      description: >-
+        Mutual TLS authentication using client certificates. Clients must
+        present a valid client certificate and key, and must trust the
+        server's CA certificate.
+  schemas:
+    ReferenceDataRequest:
+      type: object
+      description: >-
+        Request for current reference data about specific securities. Must
+        specify at least one security and at least one field.
+      required:
+        - securities
+        - fields
+      properties:
+        securities:
+          type: array
+          description: >-
+            List of Bloomberg security identifiers (e.g., 'IBM US Equity',
+            'AAPL US Equity').
+          items:
+            type: string
+          minItems: 1
+          examples:
+            - - IBM US Equity
+              - AAPL US Equity
+        fields:
+          type: array
+          description: >-
+            List of Bloomberg field mnemonics to retrieve (e.g., 'PX_LAST',
+            'NAME', 'VOLUME').
+          items:
+            type: string
+          minItems: 1
+          examples:
+            - - PX_LAST
+              - NAME
+        overrides:
+          type: array
+          description: Optional field overrides for the request.
+          items:
+            $ref: '#/components/schemas/FieldOverride'
+        returnEids:
+          type: boolean
+          description: Whether to return entitlement identifiers.
+        returnFormattedValue:
+          type: boolean
+          description: Whether to return formatted field values as strings.
+    HistoricalDataRequest:
+      type: object
+      description: >-
+        Request for end-of-day historical data about securities over a date
+        range. Must specify at least one security, one field, and start/end
+        dates.
+      required:
+        - securities
+        - fields
+        - startDate
+        - endDate
+      properties:
+        securities:
+          type: array
+          description: List of Bloomberg security identifiers.
+          items:
+            type: string
+          minItems: 1
+        fields:
+          type: array
+          description: List of Bloomberg field mnemonics to retrieve.
+          items:
+            type: string
+          minItems: 1
+        startDate:
+          type: string
+          description: >-
+            Start date for the historical data range in YYYYMMDD format.
+          pattern: '^\d{8}$'
+          examples:
+            - '20120101'
+        endDate:
+          type: string
+          description: >-
+            End date for the historical data range in YYYYMMDD format.
+          pattern: '^\d{8}$'
+          examples:
+            - '20120105'
+        periodicitySelection:
+          type: string
+          description: The frequency of data points returned.
+          enum:
+            - DAILY
+            - WEEKLY
+            - MONTHLY
+            - QUARTERLY
+            - SEMI_ANNUALLY
+            - YEARLY
+        periodicityAdjustment:
+          type: string
+          description: How to adjust data for the periodicity.
+          enum:
+            - ACTUAL
+            - CALENDAR
+            - FISCAL
+        currency:
+          type: string
+          description: >-
+            Currency code for converting values (3-letter ISO 4217 code).
+        overrides:
+          type: array
+          description: Optional field overrides.
+          items:
+            $ref: '#/components/schemas/FieldOverride'
+        maxDataPoints:
+          type: integer
+          description: Maximum number of data points to return.
+        nonTradingDayFillOption:
+          type: string
+          description: How to handle non-trading days.
+          enum:
+            - NON_TRADING_WEEKDAYS
+            - ALL_CALENDAR_DAYS
+            - ACTIVE_DAYS_ONLY
+        nonTradingDayFillMethod:
+          type: string
+          description: Fill method for non-trading days.
+          enum:
+            - PREVIOUS_VALUE
+            - NIL_VALUE
+        adjustmentNormal:
+          type: boolean
+          description: Adjust for normal cash dividends.
+        adjustmentAbnormal:
+          type: boolean
+          description: Adjust for abnormal cash dividends.
+        adjustmentSplit:
+          type: boolean
+          description: Adjust for splits.
+    IntradayBarRequest:
+      type: object
+      description: >-
+        Request for intraday bar data (OHLCV) for a single security.
+      required:
+        - security
+        - eventType
+        - startDateTime
+        - endDateTime
+        - interval
+      properties:
+        security:
+          type: string
+          description: Bloomberg security identifier.
+        eventType:
+          type: string
+          description: The type of intraday event.
+          enum:
+            - TRADE
+            - BID
+            - ASK
+            - BID_BEST
+            - ASK_BEST
+            - BEST_BID
+            - BEST_ASK
+        startDateTime:
+          type: string
+          format: date-time
+          description: Start date-time for the intraday data in ISO 8601 format.
+        endDateTime:
+          type: string
+          format: date-time
+          description: End date-time for the intraday data in ISO 8601 format.
+        interval:
+          type: integer
+          description: Bar interval in minutes.
+          minimum: 1
+          maximum: 1440
+    IntradayTickRequest:
+      type: object
+      description: >-
+        Request for intraday tick-level data for a single security.
+      required:
+        - security
+        - startDateTime
+        - endDateTime
+      properties:
+        security:
+          type: string
+          description: Bloomberg security identifier.
+        eventTypes:
+          type: array
+          description: Types of tick events to retrieve.
+          items:
+            type: string
+            enum:
+              - TRADE
+              - BID
+              - ASK
+              - BID_BEST
+              - ASK_BEST
+              - MID_PRICE
+              - AT_TRADE
+              - BEST_BID
+              - BEST_ASK
+        startDateTime:
+          type: string
+          format: date-time
+          description: Start date-time in ISO 8601 format.
+        endDateTime:
+          type: string
+          format: date-time
+          description: End date-time in ISO 8601 format.
+        includeConditionCodes:
+          type: boolean
+          description: Whether to include condition codes for each tick.
+        includeExchangeCodes:
+          type: boolean
+          description: Whether to include exchange codes for each tick.
+        includeBrokerCodes:
+          type: boolean
+          description: Whether to include broker codes for each tick.
+        includeRpsCodes:
+          type: boolean
+          description: Whether to include RPS codes for each tick.
+    FieldInfoRequest:
+      type: object
+      description: >-
+        Request for metadata about specific Bloomberg fields. Can query by
+        field ID or mnemonic.
+      properties:
+        id:
+          type: array
+          description: >-
+            List of field identifiers or mnemonics to retrieve information about.
+          items:
+            type: string
+          minItems: 1
+        returnFieldDocumentation:
+          type: string
+          description: >-
+            Whether to return the documentation text for each field.
+          enum:
+            - 'true'
+            - 'false'
+    FieldSearchRequest:
+      type: object
+      description: >-
+        Request to search for Bloomberg fields by keyword or category.
+      properties:
+        searchSpec:
+          type: string
+          description: Search term for finding relevant fields.
+        returnFieldDocumentation:
+          type: string
+          description: Whether to return documentation for matched fields.
+          enum:
+            - 'true'
+            - 'false'
+    FieldOverride:
+      type: object
+      description: A field override specification.
+      required:
+        - fieldId
+        - value
+      properties:
+        fieldId:
+          type: string
+          description: The field mnemonic to override.
+        value:
+          type: string
+          description: The override value.
+    BlpapiResponse:
+      type: object
+      description: >-
+        Standard response wrapper from the Bloomberg HTTP API. Contains
+        status information and the data payload from the BLPAPI service.
+      required:
+        - status
+        - message
+      properties:
+        status:
+          type: integer
+          description: >-
+            Status code. 0 indicates successful communication with the
+            Open API. Non-zero indicates an error.
+        message:
+          type: string
+          description: >-
+            Status message. 'OK' for successful communication, otherwise
+            contains an error description.
+        data:
+          type: array
+          description: >-
+            The response data from the Open API. Structure varies by
+            operation type. Only present when message is 'OK'.
+          items:
+            type: object
+            properties:
+              securityData:
+                oneOf:
+                  - $ref: '#/components/schemas/SecurityDataObject'
+                  - type: array
+                    items:
+                      $ref: '#/components/schemas/SecurityDataObject'
+              fieldData:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FieldInfoData'
+    BlpapiErrorResponse:
+      type: object
+      description: Error response from the HTTP API server.
+      properties:
+        status:
+          type: integer
+          description: Non-zero error status code.
+        message:
+          type: string
+          description: Error description message.
+    SecurityDataObject:
+      type: object
+      description: >-
+        Security data container returned for reference and historical data
+        requests.
+      properties:
+        security:
+          type: string
+          description: Bloomberg security identifier for this data.
+        eidData:
+          type: array
+          description: Entitlement identifier data.
+          items:
+            type: integer
+        sequenceNumber:
+          type: integer
+          description: >-
+            Sequence number indicating the order of the security in the
+            request.
+        fieldExceptions:
+          type: array
+          description: >-
+            List of field-level exceptions (e.g., invalid field names).
+          items:
+            $ref: '#/components/schemas/FieldException'
+        fieldData:
+          oneOf:
+            - type: object
+              description: >-
+                Field values as key-value pairs (for reference data responses).
+              additionalProperties: true
+            - type: array
+              description: >-
+                Array of field values by date (for historical data responses).
+              items:
+                type: object
+                properties:
+                  date:
+                    type: string
+                    format: date-time
+                    description: The date for this data point.
+                additionalProperties: true
+        securityError:
+          $ref: '#/components/schemas/SecurityError'
+    FieldException:
+      type: object
+      description: Exception details for a specific field.
+      properties:
+        fieldId:
+          type: string
+          description: The field that caused the exception.
+        errorInfo:
+          type: object
+          properties:
+            source:
+              type: string
+            code:
+              type: integer
+            category:
+              type: string
+            message:
+              type: string
+            subcategory:
+              type: string
+    SecurityError:
+      type: object
+      description: Error information for an invalid security.
+      properties:
+        source:
+          type: string
+        code:
+          type: integer
+        category:
+          type: string
+        message:
+          type: string
+        subcategory:
+          type: string
+    FieldInfoData:
+      type: object
+      description: Metadata about a Bloomberg data field.
+      properties:
+        id:
+          type: string
+          description: The field's unique identifier.
+        fieldInfo:
+          type: object
+          properties:
+            mnemonic:
+              type: string
+              description: The field mnemonic (e.g., PX_LAST, NAME).
+            description:
+              type: string
+              description: Short description of the field.
+            datatype:
+              type: string
+              description: The data type of the field.
+            documentation:
+              type: string
+              description: Detailed documentation text for the field.
+            categoryName:
+              type: array
+              description: Categories the field belongs to.
+              items:
+                type: string
+            property:
+              type: array
+              description: Properties of the field.
+              items:
+                type: string
+            overrides:
+              type: array
+              description: Available override specifications.
+              items:
+                type: string
+            ftype:
+              type: string
+              description: The field type classification.
+    SubscribeRequest:
+      type: array
+      description: >-
+        List of subscription definitions to start subscribing to market data.
+      items:
+        type: object
+        required:
+          - security
+          - correlationId
+          - fields
+        properties:
+          security:
+            type: string
+            description: Bloomberg security identifier to subscribe to.
+          correlationId:
+            type: integer
+            description: >-
+              Client-assigned correlation ID for identifying this subscription.
+          fields:
+            type: array
+            description: List of fields to subscribe to.
+            items:
+              type: string
+    UnsubscribeRequest:
+      type: array
+      description: >-
+        List of correlation IDs to unsubscribe. An empty array implies
+        unsubscribe from all active subscriptions.
+      items:
+        type: integer
+    SubscriptionDataMessage:
+      type: object
+      description: A market data update message from a subscription.
+      properties:
+        correlationId:
+          type: integer
+          description: >-
+            The correlation ID identifying which subscription this data
+            belongs to.
+        data:
+          type: object
+          description: >-
+            The subscription data payload containing field updates. Keys
+            are field mnemonics and values are the updated values.
+          additionalProperties: true

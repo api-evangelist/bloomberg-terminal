@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/api-search/bloomberg-terminal/blob/main/json-schema/bloomberg-terminal-field-schema.json",
+  "title": "Bloomberg Data Field",
+  "description": "Represents metadata about a Bloomberg data field. Bloomberg provides thousands of data fields accessible via BLPAPI, each identified by a unique mnemonic (e.g., PX_LAST, NAME, VOLUME). This schema describes the field metadata returned by the //blp/apiflds service.",
+  "type": "object",
+  "required": [
+    "id"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "The unique Bloomberg field identifier (e.g., DS002).",
+      "examples": [
+        "DS002",
+        "PR005"
+      ]
+    },
+    "fieldInfo": {
+      "type": "object",
+      "description": "Metadata about the field.",
+      "properties": {
+        "mnemonic": {
+          "type": "string",
+          "description": "The field mnemonic used in API requests (e.g., PX_LAST, NAME, VOLUME).",
+          "examples": [
+            "PX_LAST",
+            "NAME",
+            "VOLUME",
+            "CUR_MKT_CAP",
+            "PE_RATIO",
+            "EPS_ANNUALIZED"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "description": "Short description of the field.",
+          "examples": [
+            "Last Price",
+            "Name",
+            "Volume"
+          ]
+        },
+        "datatype": {
+          "type": "string",
+          "description": "The data type of the field value.",
+          "enum": [
+            "String",
+            "Double",
+            "Float",
+            "Int32",
+            "Int64",
+            "Date",
+            "Time",
+            "Datetime",
+            "Bool",
+            "Char",
+            "Enum",
+            "Sequence"
+          ]
+        },
+        "documentation": {
+          "type": "string",
+          "description": "Detailed documentation text for the field, including usage notes and asset class-specific behavior."
+        },
+        "categoryName": {
+          "type": "array",
+          "description": "Categories the field belongs to.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "property": {
+          "type": "array",
+          "description": "Properties of the field (e.g., data rights requirements).",
+          "items": {
+            "type": "string"
+          }
+        },
+        "overrides": {
+          "type": "array",
+          "description": "Available override specifications for the field.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "ftype": {
+          "type": "string",
+          "description": "The field type classification.",
+          "enum": [
+            "Character",
+            "Numeric",
+            "Date",
+            "Time",
+            "Boolean",
+            "Bulk Format",
+            "Price",
+            "Currency",
+            "Integer"
+          ]
+        }
+      }
+    }
+  },
+  "additionalProperties": true
+}

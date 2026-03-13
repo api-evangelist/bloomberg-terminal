@@ -1,0 +1,116 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/api-search/bloomberg-terminal/blob/main/json-schema/bloomberg-terminal-market-data-schema.json",
+  "title": "Bloomberg Market Data",
+  "description": "Represents market data for a Bloomberg security, including real-time price data, trading volume, and market indicators. This schema covers the most commonly used Bloomberg market data fields delivered through BLPAPI subscriptions and reference data requests.",
+  "type": "object",
+  "required": [
+    "security"
+  ],
+  "properties": {
+    "security": {
+      "type": "string",
+      "description": "Bloomberg security identifier."
+    },
+    "lastPrice": {
+      "type": "number",
+      "description": "Last traded price (Bloomberg field: LAST_PRICE / PX_LAST)."
+    },
+    "bid": {
+      "type": "number",
+      "description": "Current best bid price (Bloomberg field: BID)."
+    },
+    "ask": {
+      "type": "number",
+      "description": "Current best ask price (Bloomberg field: ASK)."
+    },
+    "mid": {
+      "type": "number",
+      "description": "Mid price between bid and ask (Bloomberg field: MID)."
+    },
+    "open": {
+      "type": "number",
+      "description": "Opening price for the current session (Bloomberg field: OPEN / PX_OPEN)."
+    },
+    "high": {
+      "type": "number",
+      "description": "Session high price (Bloomberg field: HIGH / PX_HIGH)."
+    },
+    "low": {
+      "type": "number",
+      "description": "Session low price (Bloomberg field: LOW / PX_LOW)."
+    },
+    "close": {
+      "type": "number",
+      "description": "Previous session closing price (Bloomberg field: PX_CLOSE_1D)."
+    },
+    "volume": {
+      "type": "integer",
+      "description": "Total trading volume for the current session (Bloomberg field: VOLUME / PX_VOLUME)."
+    },
+    "vwap": {
+      "type": "number",
+      "description": "Volume-weighted average price (Bloomberg field: VWAP)."
+    },
+    "bidSize": {
+      "type": "integer",
+      "description": "Size at the best bid price (Bloomberg field: BID_SIZE)."
+    },
+    "askSize": {
+      "type": "integer",
+      "description": "Size at the best ask price (Bloomberg field: ASK_SIZE)."
+    },
+    "tradeSize": {
+      "type": "integer",
+      "description": "Size of the last trade (Bloomberg field: TRADE_SIZE)."
+    },
+    "lastTradeTime": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp of the last trade (Bloomberg field: LAST_TRADE_TIME)."
+    },
+    "netChange": {
+      "type": "number",
+      "description": "Net change from previous close (Bloomberg field: CHG_NET_1D)."
+    },
+    "percentChange": {
+      "type": "number",
+      "description": "Percent change from previous close (Bloomberg field: CHG_PCT_1D)."
+    },
+    "turnover": {
+      "type": "number",
+      "description": "Total value traded (Bloomberg field: TURNOVER)."
+    },
+    "numTrades": {
+      "type": "integer",
+      "description": "Number of trades in the session (Bloomberg field: NUM_TRADES)."
+    },
+    "marketCap": {
+      "type": "number",
+      "description": "Current market capitalization (Bloomberg field: CUR_MKT_CAP)."
+    },
+    "previousClose": {
+      "type": "number",
+      "description": "Previous session close price (Bloomberg field: PREV_CLOSE_VALUE_DT)."
+    },
+    "fiftyTwoWeekHigh": {
+      "type": "number",
+      "description": "52-week high price (Bloomberg field: HIGH_52WEEK)."
+    },
+    "fiftyTwoWeekLow": {
+      "type": "number",
+      "description": "52-week low price (Bloomberg field: LOW_52WEEK)."
+    },
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date of the market data record."
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when the data was generated or received."
+    }
+  },
+  "additionalProperties": true
+}

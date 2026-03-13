@@ -1,0 +1,698 @@
+openapi: 3.1.0
+info:
+  title: Bloomberg B-PIPE Market Data Feed
+  description: >-
+    Bloomberg Market Data Feed (B-PIPE) delivers real-time and reference
+    data from more than 330 exchanges and 5,000 pricing contributors
+    globally, covering 35 million instruments across all asset classes.
+    B-PIPE provides a direct, low-latency data feed designed for
+    systematic trading, portfolio management, risk analytics, and
+    enterprise data distribution. It uses the BLPAPI protocol for
+    connectivity and supports both managed and unmanaged subscription
+    modes. This specification documents the logical service operations
+    available through B-PIPE, including real-time market data
+    subscriptions, reference data requests, and entitlement management.
+  version: 3.26.1
+  contact:
+    name: Bloomberg Enterprise Data Support
+    url: https://www.bloomberg.com/professional/products/data/enterprise-catalog/real-time-data-feed/
+  license:
+    name: Bloomberg Professional Services
+    url: https://www.bloomberg.com/notices/tos/
+  x-logo:
+    url: https://www.bloomberg.com/company/wp-content/uploads/sites/2/2021/09/bloomberg-logo-1.png
+servers:
+  - url: https://api.bloomberg.com/bpipe
+    description: >-
+      Bloomberg B-PIPE endpoint. B-PIPE uses the BLPAPI binary protocol
+      with dedicated connectivity to Bloomberg infrastructure for
+      low-latency data delivery.
+tags:
+  - name: Real-Time Market Data
+    description: >-
+      Real-time streaming market data via the //blp/mktdata service.
+      B-PIPE delivers tick-by-tick data from global exchanges with
+      sub-millisecond latency.
+  - name: Market Depth
+    description: >-
+      Level 2 market depth data via the //blp/mktdepthdata service,
+      providing full order book visibility for supported exchanges.
+  - name: Reference Data
+    description: >-
+      Request-response reference data via the //blp/refdata service
+      for snapshots, historical data, and security attributes.
+  - name: Page Data
+    description: >-
+      Contributed page data via the //blp/pagedata service for accessing
+      broker and contributor pages.
+  - name: Entitlements
+    description: >-
+      Entitlement checking and management for controlling data access
+      based on exchange agreements and licensing.
+paths:
+  /blp/mktdata/Subscribe:
+    post:
+      operationId: bpipeMarketDataSubscribe
+      summary: Subscribe to real-time market data
+      description: >-
+        Creates real-time market data subscriptions for securities via
+        B-PIPE. Delivers continuous tick-by-tick updates including
+        prices, volumes, trade conditions, and market indicators from
+        330+ exchanges globally. B-PIPE supports conflated and
+        unconflated data delivery modes depending on the subscription
+        configuration and entitlements.
+      tags:
+        - Real-Time Market Data
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MarketDataSubscription'
+            examples:
+              globalEquities:
+                summary: Subscribe to global equity market data
+                value:
+                  subscriptions:
+                    - security: IBM US Equity
+                      fields:
+                        - LAST_PRICE
+                        - BID
+                        - ASK
+                        - BID_SIZE
+                        - ASK_SIZE
+                        - VOLUME
+                        - TRADE_SIZE
+                        - LAST_TRADE_TIME
+                      correlationId: 1
+                    - security: 7203 JP Equity
+                      fields:
+                        - LAST_PRICE
+                        - BID
+                        - ASK
+                        - VOLUME
+                      correlationId: 2
+                    - security: EURUSD Curncy
+                      fields:
+                        - LAST_PRICE
+                        - BID
+                        - ASK
+                        - MID
+                      correlationId: 3
+      responses:
+        '200':
+          description: >-
+            Subscription created. Data delivered asynchronously via BLPAPI
+            event loop.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionResponse'
+        '403':
+          description: >-
+            Insufficient entitlements for one or more subscriptions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /blp/mktdepthdata/Subscribe:
+    post:
+      operationId: bpipeMarketDepthSubscribe
+      summary: Subscribe to market depth (Level 2) data
+      description: >-
+        Creates a subscription for Level 2 market depth data, providing
+        full order book visibility including individual bids and asks
+        at each price level. Supports both market-by-order (MBO) and
+        market-by-price (MBP) data depending on exchange support.
+      tags:
+        - Market Depth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MarketDepthSubscription'
+            examples:
+              orderBook:
+                summary: Subscribe to order book for IBM
+                value:
+                  subscriptions:
+                    - security: IBM US Equity
+                      type: MARKET_BY_PRICE
+                      correlationId: 100
+      responses:
+        '200':
+          description: Market depth subscription created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionResponse'
+        '403':
+          description: Insufficient entitlements for market depth data.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /blp/refdata/ReferenceDataRequest:
+    post:
+      operationId: bpipeReferenceDataRequest
+      summary: Request current reference data via B-PIPE
+      description: >-
+        Retrieves current reference data for securities through the B-PIPE
+        infrastructure. Used for snapshot data retrieval in enterprise
+        environments without a Bloomberg Terminal.
+      tags:
+        - Reference Data
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReferenceDataRequest'
+      responses:
+        '200':
+          description: Reference data retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReferenceDataResponse'
+  /blp/refdata/HistoricalDataRequest:
+    post:
+      operationId: bpipeHistoricalDataRequest
+      summary: Request historical data via B-PIPE
+      description: >-
+        Retrieves historical end-of-day data through B-PIPE for backtesting,
+        analytics, and research workflows.
+      tags:
+        - Reference Data
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HistoricalDataRequest'
+      responses:
+        '200':
+          description: Historical data retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HistoricalDataResponse'
+  /blp/refdata/IntradayBarRequest:
+    post:
+      operationId: bpipeIntradayBarRequest
+      summary: Request intraday bar data via B-PIPE
+      description: >-
+        Retrieves intraday OHLCV bar data through B-PIPE for a security.
+      tags:
+        - Reference Data
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IntradayBarRequest'
+      responses:
+        '200':
+          description: Intraday bar data retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntradayBarResponse'
+  /blp/refdata/IntradayTickRequest:
+    post:
+      operationId: bpipeIntradayTickRequest
+      summary: Request intraday tick data via B-PIPE
+      description: >-
+        Retrieves tick-level data through B-PIPE for detailed trade
+        and quote analysis.
+      tags:
+        - Reference Data
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IntradayTickRequest'
+      responses:
+        '200':
+          description: Intraday tick data retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntradayTickResponse'
+  /blp/pagedata/Subscribe:
+    post:
+      operationId: bpipePageDataSubscribe
+      summary: Subscribe to page data
+      description: >-
+        Creates a subscription for Bloomberg page data, including
+        contributed pages from brokers and pricing contributors. Page
+        data is typically displayed in a fixed-width character grid
+        format.
+      tags:
+        - Page Data
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PageDataSubscription'
+      responses:
+        '200':
+          description: Page data subscription created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionResponse'
+  /blp/apiauth/AuthorizationRequest:
+    post:
+      operationId: bpipeAuthorizationRequest
+      summary: Authorize user for B-PIPE access
+      description: >-
+        Authorizes a user identity for accessing data through B-PIPE.
+        Entitlement checks verify that the user has appropriate exchange
+        agreements and data licensing for the requested instruments.
+        B-PIPE supports both user-based (BPS) and application-based
+        authorization models.
+      tags:
+        - Entitlements
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthorizationRequest'
+      responses:
+        '200':
+          description: User authorized successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizationResponse'
+        '403':
+          description: Authorization failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /blp/eidprovider/EidLookupRequest:
+    post:
+      operationId: bpipeEidLookupRequest
+      summary: Look up entitlement identifiers
+      description: >-
+        Retrieves entitlement identifiers (EIDs) for securities to
+        determine the exchange agreements and data licensing required
+        for accessing specific data. EIDs are used in entitlement
+        enforcement for data redistribution compliance.
+      tags:
+        - Entitlements
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - securities
+              properties:
+                securities:
+                  type: array
+                  items:
+                    type: string
+                  description: Securities to look up EIDs for.
+      responses:
+        '200':
+          description: EID lookup results returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        security:
+                          type: string
+                        eidData:
+                          type: array
+                          items:
+                            type: integer
+                            description: Entitlement identifier values.
+components:
+  schemas:
+    MarketDataSubscription:
+      type: object
+      required:
+        - subscriptions
+      properties:
+        subscriptions:
+          type: array
+          items:
+            type: object
+            required:
+              - security
+              - fields
+              - correlationId
+            properties:
+              security:
+                type: string
+                description: Bloomberg security identifier.
+              fields:
+                type: array
+                items:
+                  type: string
+                description: Market data fields to subscribe to.
+              correlationId:
+                type: integer
+                description: Client-assigned correlation ID.
+              interval:
+                type: number
+                description: Minimum interval between updates in seconds.
+    MarketDepthSubscription:
+      type: object
+      required:
+        - subscriptions
+      properties:
+        subscriptions:
+          type: array
+          items:
+            type: object
+            required:
+              - security
+              - correlationId
+            properties:
+              security:
+                type: string
+                description: Bloomberg security identifier.
+              type:
+                type: string
+                description: Market depth data type.
+                enum:
+                  - MARKET_BY_PRICE
+                  - MARKET_BY_ORDER
+              correlationId:
+                type: integer
+    PageDataSubscription:
+      type: object
+      required:
+        - subscriptions
+      properties:
+        subscriptions:
+          type: array
+          items:
+            type: object
+            required:
+              - topic
+              - correlationId
+            properties:
+              topic:
+                type: string
+                description: Page topic identifier.
+              correlationId:
+                type: integer
+    ReferenceDataRequest:
+      type: object
+      required:
+        - securities
+        - fields
+      properties:
+        securities:
+          type: array
+          items:
+            type: string
+          minItems: 1
+        fields:
+          type: array
+          items:
+            type: string
+          minItems: 1
+        overrides:
+          type: array
+          items:
+            type: object
+            properties:
+              fieldId:
+                type: string
+              value:
+                type: string
+        returnEids:
+          type: boolean
+    ReferenceDataResponse:
+      type: object
+      properties:
+        securityData:
+          type: array
+          items:
+            type: object
+            properties:
+              security:
+                type: string
+              eidData:
+                type: array
+                items:
+                  type: integer
+              sequenceNumber:
+                type: integer
+              fieldData:
+                type: object
+                additionalProperties: true
+              fieldExceptions:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    fieldId:
+                      type: string
+                    errorInfo:
+                      type: object
+                      properties:
+                        source:
+                          type: string
+                        code:
+                          type: integer
+                        category:
+                          type: string
+                        message:
+                          type: string
+    HistoricalDataRequest:
+      type: object
+      required:
+        - securities
+        - fields
+        - startDate
+        - endDate
+      properties:
+        securities:
+          type: array
+          items:
+            type: string
+        fields:
+          type: array
+          items:
+            type: string
+        startDate:
+          type: string
+          pattern: '^\d{8}$'
+        endDate:
+          type: string
+          pattern: '^\d{8}$'
+        periodicitySelection:
+          type: string
+          enum:
+            - DAILY
+            - WEEKLY
+            - MONTHLY
+            - QUARTERLY
+            - SEMI_ANNUALLY
+            - YEARLY
+        adjustmentNormal:
+          type: boolean
+        adjustmentAbnormal:
+          type: boolean
+        adjustmentSplit:
+          type: boolean
+    HistoricalDataResponse:
+      type: object
+      properties:
+        securityData:
+          type: array
+          items:
+            type: object
+            properties:
+              security:
+                type: string
+              sequenceNumber:
+                type: integer
+              fieldData:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    date:
+                      type: string
+                      format: date
+                  additionalProperties: true
+    IntradayBarRequest:
+      type: object
+      required:
+        - security
+        - eventType
+        - startDateTime
+        - endDateTime
+        - interval
+      properties:
+        security:
+          type: string
+        eventType:
+          type: string
+          enum:
+            - TRADE
+            - BID
+            - ASK
+        startDateTime:
+          type: string
+          format: date-time
+        endDateTime:
+          type: string
+          format: date-time
+        interval:
+          type: integer
+          minimum: 1
+          maximum: 1440
+    IntradayBarResponse:
+      type: object
+      properties:
+        barData:
+          type: object
+          properties:
+            barTickData:
+              type: array
+              items:
+                type: object
+                properties:
+                  time:
+                    type: string
+                    format: date-time
+                  open:
+                    type: number
+                  high:
+                    type: number
+                  low:
+                    type: number
+                  close:
+                    type: number
+                  volume:
+                    type: integer
+                  numEvents:
+                    type: integer
+    IntradayTickRequest:
+      type: object
+      required:
+        - security
+        - startDateTime
+        - endDateTime
+      properties:
+        security:
+          type: string
+        eventTypes:
+          type: array
+          items:
+            type: string
+            enum:
+              - TRADE
+              - BID
+              - ASK
+        startDateTime:
+          type: string
+          format: date-time
+        endDateTime:
+          type: string
+          format: date-time
+        includeConditionCodes:
+          type: boolean
+        includeExchangeCodes:
+          type: boolean
+    IntradayTickResponse:
+      type: object
+      properties:
+        tickData:
+          type: object
+          properties:
+            tickData:
+              type: array
+              items:
+                type: object
+                properties:
+                  time:
+                    type: string
+                    format: date-time
+                  type:
+                    type: string
+                  value:
+                    type: number
+                  size:
+                    type: integer
+    SubscriptionResponse:
+      type: object
+      properties:
+        subscriptions:
+          type: array
+          items:
+            type: object
+            properties:
+              correlationId:
+                type: integer
+              status:
+                type: string
+                enum:
+                  - subscribed
+                  - failed
+              message:
+                type: string
+    AuthorizationRequest:
+      type: object
+      properties:
+        uuid:
+          type: integer
+          description: Bloomberg UUID for user-based authorization.
+        ipAddress:
+          type: string
+          description: IP address of the requesting client.
+        token:
+          type: string
+          description: Authorization token.
+        applicationName:
+          type: string
+          description: Application name for app-based authorization.
+    AuthorizationResponse:
+      type: object
+      properties:
+        authorized:
+          type: boolean
+        identity:
+          type: object
+          properties:
+            uuid:
+              type: integer
+            seatType:
+              type: string
+              enum:
+                - BPS
+                - NONBPS
+                - INVALID_SEAT
+    ErrorResponse:
+      type: object
+      properties:
+        source:
+          type: string
+        code:
+          type: integer
+        category:
+          type: string
+        message:
+          type: string
+        subcategory:
+          type: string

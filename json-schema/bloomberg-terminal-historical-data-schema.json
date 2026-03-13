@@ -1,0 +1,225 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/api-search/bloomberg-terminal/blob/main/json-schema/bloomberg-terminal-historical-data-schema.json",
+  "title": "Bloomberg Historical Data",
+  "description": "Represents a historical data response from Bloomberg BLPAPI, containing time-series data for one or more securities over a date range. Used for end-of-day historical data, intraday bars, and intraday tick data.",
+  "type": "object",
+  "required": [
+    "securityData"
+  ],
+  "properties": {
+    "securityData": {
+      "type": "array",
+      "description": "Array of security-level historical data containers.",
+      "items": {
+        "$ref": "#/$defs/SecurityHistoricalData"
+      }
+    }
+  },
+  "$defs": {
+    "SecurityHistoricalData": {
+      "type": "object",
+      "description": "Historical data for a single security.",
+      "required": [
+        "security"
+      ],
+      "properties": {
+        "security": {
+          "type": "string",
+          "description": "Bloomberg security identifier."
+        },
+        "eidData": {
+          "type": "array",
+          "description": "Entitlement identifier data.",
+          "items": {
+            "type": "integer"
+          }
+        },
+        "sequenceNumber": {
+          "type": "integer",
+          "description": "Sequence number in the request order."
+        },
+        "fieldExceptions": {
+          "type": "array",
+          "description": "Field-level exceptions encountered.",
+          "items": {
+            "$ref": "#/$defs/FieldException"
+          }
+        },
+        "fieldData": {
+          "type": "array",
+          "description": "Array of data points, one per date.",
+          "items": {
+            "$ref": "#/$defs/HistoricalDataPoint"
+          }
+        },
+        "securityError": {
+          "$ref": "#/$defs/SecurityError"
+        }
+      }
+    },
+    "HistoricalDataPoint": {
+      "type": "object",
+      "description": "A single historical data point for a specific date.",
+      "required": [
+        "date"
+      ],
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date",
+          "description": "The date for this data point."
+        },
+        "PX_LAST": {
+          "type": "number",
+          "description": "Last/closing price."
+        },
+        "PX_OPEN": {
+          "type": "number",
+          "description": "Opening price."
+        },
+        "PX_HIGH": {
+          "type": "number",
+          "description": "Session high price."
+        },
+        "PX_LOW": {
+          "type": "number",
+          "description": "Session low price."
+        },
+        "PX_VOLUME": {
+          "type": "integer",
+          "description": "Trading volume."
+        }
+      },
+      "additionalProperties": true
+    },
+    "IntradayBar": {
+      "type": "object",
+      "description": "A single intraday OHLCV bar data point.",
+      "required": [
+        "time"
+      ],
+      "properties": {
+        "time": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp for the bar."
+        },
+        "open": {
+          "type": "number",
+          "description": "Opening price for the bar interval."
+        },
+        "high": {
+          "type": "number",
+          "description": "High price for the bar interval."
+        },
+        "low": {
+          "type": "number",
+          "description": "Low price for the bar interval."
+        },
+        "close": {
+          "type": "number",
+          "description": "Closing price for the bar interval."
+        },
+        "volume": {
+          "type": "integer",
+          "description": "Volume traded during the bar interval."
+        },
+        "numEvents": {
+          "type": "integer",
+          "description": "Number of events (trades) during the interval."
+        },
+        "value": {
+          "type": "number",
+          "description": "Total value traded during the interval."
+        }
+      }
+    },
+    "IntradayTick": {
+      "type": "object",
+      "description": "A single intraday tick data point.",
+      "required": [
+        "time"
+      ],
+      "properties": {
+        "time": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of the tick."
+        },
+        "type": {
+          "type": "string",
+          "description": "Type of tick event (TRADE, BID, ASK)."
+        },
+        "value": {
+          "type": "number",
+          "description": "Price value of the tick."
+        },
+        "size": {
+          "type": "integer",
+          "description": "Size/volume of the tick."
+        },
+        "conditionCodes": {
+          "type": "string",
+          "description": "Trade condition codes."
+        },
+        "exchangeCode": {
+          "type": "string",
+          "description": "Exchange where the tick occurred."
+        }
+      }
+    },
+    "FieldException": {
+      "type": "object",
+      "description": "Exception information for a specific field.",
+      "properties": {
+        "fieldId": {
+          "type": "string",
+          "description": "The field that caused the exception."
+        },
+        "errorInfo": {
+          "type": "object",
+          "properties": {
+            "source": {
+              "type": "string"
+            },
+            "code": {
+              "type": "integer"
+            },
+            "category": {
+              "type": "string"
+            },
+            "message": {
+              "type": "string"
+            },
+            "subcategory": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "SecurityError": {
+      "type": "object",
+      "description": "Error information for an invalid or unresolvable security.",
+      "properties": {
+        "source": {
+          "type": "string"
+        },
+        "code": {
+          "type": "integer"
+        },
+        "category": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "subcategory": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "additionalProperties": true
+}

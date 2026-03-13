@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/api-search/bloomberg-terminal/blob/main/json-schema/bloomberg-terminal-worksheet-schema.json",
+  "title": "Bloomberg Terminal Worksheet",
+  "description": "Represents a Bloomberg Terminal worksheet, which is a named collection of securities. Worksheets are used in the Bloomberg Terminal for organizing watchlists, portfolios, and security groups. They can be created, read, and modified through the Terminal Connect API.",
+  "type": "object",
+  "required": [
+    "id",
+    "name"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier for the worksheet."
+    },
+    "name": {
+      "type": "string",
+      "description": "Display name of the worksheet."
+    },
+    "securities": {
+      "type": "array",
+      "description": "List of Bloomberg security identifiers contained in the worksheet.",
+      "items": {
+        "type": "string"
+      },
+      "examples": [
+        [
+          "AAPL US Equity",
+          "MSFT US Equity",
+          "GOOGL US Equity",
+          "AMZN US Equity"
+        ]
+      ]
+    },
+    "created": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when the worksheet was created."
+    },
+    "modified": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when the worksheet was last modified."
+    }
+  },
+  "additionalProperties": true
+}

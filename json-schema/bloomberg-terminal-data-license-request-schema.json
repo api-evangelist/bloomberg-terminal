@@ -1,0 +1,158 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/api-search/bloomberg-terminal/blob/main/json-schema/bloomberg-terminal-data-license-request-schema.json",
+  "title": "Bloomberg Data License Request",
+  "description": "Represents a data request in the Bloomberg Data License Hypermedia API (HAPI). A data request combines a universe of securities, a field list, and a trigger that schedules execution. When triggered, Bloomberg generates a dataset containing the requested data.",
+  "type": "object",
+  "required": [
+    "@type",
+    "identifier",
+    "universe",
+    "fieldList",
+    "trigger"
+  ],
+  "properties": {
+    "@type": {
+      "type": "string",
+      "description": "The type of data request.",
+      "enum": [
+        "DataRequest",
+        "HistoryRequest"
+      ]
+    },
+    "identifier": {
+      "type": "string",
+      "description": "Unique identifier for the data request."
+    },
+    "title": {
+      "type": "string",
+      "description": "Display title for the request."
+    },
+    "description": {
+      "type": "string",
+      "description": "Description of the data request purpose."
+    },
+    "universe": {
+      "type": "object",
+      "description": "Reference to the universe of securities.",
+      "required": [
+        "@ref"
+      ],
+      "properties": {
+        "@ref": {
+          "type": "string",
+          "format": "uri-reference",
+          "description": "Relative URI to the universe resource (e.g., /eap/catalogs/{catalog}/universes/{id}/)."
+        }
+      }
+    },
+    "fieldList": {
+      "type": "object",
+      "description": "Reference to the field list.",
+      "required": [
+        "@ref"
+      ],
+      "properties": {
+        "@ref": {
+          "type": "string",
+          "format": "uri-reference",
+          "description": "Relative URI to the field list resource."
+        }
+      }
+    },
+    "trigger": {
+      "type": "object",
+      "description": "Reference to the trigger that schedules execution.",
+      "required": [
+        "@ref"
+      ],
+      "properties": {
+        "@ref": {
+          "type": "string",
+          "format": "uri-reference",
+          "description": "Relative URI to the trigger resource (e.g., /eap/catalogs/bbg/triggers/oneshot/)."
+        }
+      }
+    },
+    "formatting": {
+      "type": "object",
+      "description": "Output formatting options for the generated dataset.",
+      "properties": {
+        "@type": {
+          "type": "string",
+          "enum": [
+            "DataFormat"
+          ]
+        },
+        "columnHeader": {
+          "type": "boolean",
+          "description": "Whether to include column headers in the output."
+        },
+        "delimiter": {
+          "type": "string",
+          "description": "Column delimiter character (e.g., '|', ',')."
+        },
+        "fileType": {
+          "type": "string",
+          "description": "Line ending format.",
+          "enum": [
+            "unixFileType",
+            "dosFileType"
+          ]
+        }
+      }
+    },
+    "runtimeOptions": {
+      "type": "object",
+      "description": "Runtime options for request execution, including date range for historical requests.",
+      "properties": {
+        "dateRange": {
+          "type": "object",
+          "description": "Date range specification.",
+          "properties": {
+            "@type": {
+              "type": "string",
+              "enum": [
+                "IntervalDateRange",
+                "RelativeDateRange"
+              ]
+            },
+            "startDate": {
+              "type": "string",
+              "format": "date",
+              "description": "Start date for the data range."
+            },
+            "endDate": {
+              "type": "string",
+              "format": "date",
+              "description": "End date for the data range."
+            }
+          }
+        },
+        "period": {
+          "type": "string",
+          "description": "Periodicity of data points.",
+          "enum": [
+            "daily",
+            "weekly",
+            "monthly",
+            "quarterly",
+            "semiAnnual",
+            "yearly"
+          ]
+        }
+      }
+    },
+    "status": {
+      "type": "string",
+      "description": "Current status of the request.",
+      "enum": [
+        "pending",
+        "executing",
+        "completed",
+        "failed"
+      ]
+    }
+  },
+  "additionalProperties": true
+}

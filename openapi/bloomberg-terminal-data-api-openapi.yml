@@ -1,0 +1,1006 @@
+openapi: 3.1.0
+info:
+  title: Bloomberg Data API (BLPAPI)
+  description: >-
+    The Bloomberg Data API (BLPAPI) provides programmatic access to Bloomberg
+    real-time and historical market data, reference data, and pricing
+    information through the Bloomberg Professional service. BLPAPI is a
+    native protocol-based API with SDKs available for C++, Java, C# (.NET),
+    and Python. This OpenAPI specification documents the logical service
+    operations exposed by BLPAPI for the //blp/refdata, //blp/mktdata,
+    //blp/mktbar, //blp/apiflds, and //blp/instruments services. The actual
+    transport is the BLPAPI binary protocol (not HTTP); this specification
+    serves as a reference for the request-response operations available.
+  version: 3.26.1
+  contact:
+    name: Bloomberg API Support
+    email: apisupport@bloomberg.net
+    url: https://www.bloomberg.com/professional/support/api-library/
+  license:
+    name: Bloomberg Professional Services
+    url: https://www.bloomberg.com/notices/tos/
+  x-logo:
+    url: https://www.bloomberg.com/company/wp-content/uploads/sites/2/2021/09/bloomberg-logo-1.png
+servers:
+  - url: https://api.bloomberg.com
+    description: >-
+      Bloomberg BLPAPI endpoint. Note that BLPAPI uses a proprietary binary
+      protocol; this URL is for reference. Actual connections use the BLPAPI
+      SDK to connect to Bloomberg infrastructure.
+tags:
+  - name: Reference Data
+    description: >-
+      The //blp/refdata service provides request-response access to current
+      reference data, historical end-of-day data, intraday bars, and
+      intraday tick data for securities.
+  - name: Market Data
+    description: >-
+      The //blp/mktdata service provides real-time streaming market data
+      subscriptions for securities, delivering live price updates, trade
+      information, and market depth.
+  - name: Market Bar Data
+    description: >-
+      The //blp/mktbar service provides real-time intraday bar subscriptions
+      delivering periodic OHLCV bar updates for securities.
+  - name: Field Information
+    description: >-
+      The //blp/apiflds service provides metadata about Bloomberg data
+      fields, including field definitions, data types, and documentation.
+  - name: Instruments
+    description: >-
+      The //blp/instruments service provides security lookup and instrument
+      search capabilities with filtering by asset class.
+paths:
+  /blp/refdata/ReferenceDataRequest:
+    post:
+      operationId: referenceDataRequest
+      summary: Request current reference data for securities
+      description: >-
+        Retrieves current (snapshot) data for one or more securities and
+        fields. Returns the most recent values for the requested fields.
+        This is the most common BLPAPI operation for retrieving current
+        market data, fundamental data, and security attributes.
+      tags:
+        - Reference Data
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReferenceDataRequest'
+            examples:
+              basicRequest:
+                summary: Basic reference data request
+                value:
+                  securities:
+                    - IBM US Equity
+                    - AAPL US Equity
+                  fields:
+                    - PX_LAST
+                    - NAME
+                    - MARKET_CAP
+                    - PE_RATIO
+                    - CUR_MKT_CAP
+      responses:
+        '200':
+          description: Reference data retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReferenceDataResponse'
+  /blp/refdata/HistoricalDataRequest:
+    post:
+      operationId: historicalDataRequest
+      summary: Request historical end-of-day data for securities
+      description: >-
+        Retrieves end-of-day historical data for one or more securities
+        over a specified date range with configurable periodicity. Supports
+        adjustments for splits, dividends, and currency conversion.
+      tags:
+        - Reference Data
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HistoricalDataRequest'
+            examples:
+              dailyPrices:
+                summary: Daily closing prices for 2025
+                value:
+                  securities:
+                    - IBM US Equity
+                  fields:
+                    - PX_LAST
+                    - PX_OPEN
+                    - PX_HIGH
+                    - PX_LOW
+                    - PX_VOLUME
+                  startDate: '20250101'
+                  endDate: '20250331'
+                  periodicitySelection: DAILY
+      responses:
+        '200':
+          description: Historical data retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HistoricalDataResponse'
+  /blp/refdata/IntradayBarRequest:
+    post:
+      operationId: intradayBarRequest
+      summary: Request intraday bar data for a security
+      description: >-
+        Retrieves intraday OHLCV bar data for a single security over a
+        specified time range. Supports configurable bar intervals and
+        event types (TRADE, BID, ASK).
+      tags:
+        - Reference Data
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IntradayBarRequest'
+            examples:
+              fiveMinBars:
+                summary: 5-minute trade bars
+                value:
+                  security: IBM US Equity
+                  eventType: TRADE
+                  startDateTime: '2025-03-01T09:30:00'
+                  endDateTime: '2025-03-01T16:00:00'
+                  interval: 5
+      responses:
+        '200':
+          description: Intraday bar data retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntradayBarResponse'
+  /blp/refdata/IntradayTickRequest:
+    post:
+      operationId: intradayTickRequest
+      summary: Request intraday tick data for a security
+      description: >-
+        Retrieves tick-level intraday data for a single security over a
+        specified time range, including individual trades, bids, and asks
+        with optional condition codes and exchange codes.
+      tags:
+        - Reference Data
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IntradayTickRequest'
+            examples:
+              tradeTicks:
+                summary: Trade ticks for IBM
+                value:
+                  security: IBM US Equity
+                  eventTypes:
+                    - TRADE
+                  startDateTime: '2025-03-01T09:30:00'
+                  endDateTime: '2025-03-01T10:00:00'
+                  includeConditionCodes: true
+                  includeExchangeCodes: true
+      responses:
+        '200':
+          description: Intraday tick data retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntradayTickResponse'
+  /blp/mktdata/Subscribe:
+    post:
+      operationId: marketDataSubscribe
+      summary: Subscribe to real-time market data
+      description: >-
+        Creates a real-time market data subscription for one or more
+        securities and fields. The subscription delivers continuous
+        updates as market data changes. This is the primary mechanism
+        for receiving live price feeds through BLPAPI. Subscription
+        data is delivered asynchronously via the BLPAPI event loop.
+      tags:
+        - Market Data
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MarketDataSubscription'
+            examples:
+              livePrices:
+                summary: Subscribe to live price data
+                value:
+                  subscriptions:
+                    - security: IBM US Equity
+                      fields:
+                        - LAST_PRICE
+                        - BID
+                        - ASK
+                        - VOLUME
+                      correlationId: 1
+                    - security: AAPL US Equity
+                      fields:
+                        - LAST_PRICE
+                        - BID
+                        - ASK
+                      correlationId: 2
+      responses:
+        '200':
+          description: >-
+            Subscription created. Data will be delivered asynchronously
+            via BLPAPI events.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionResponse'
+  /blp/mktbar/Subscribe:
+    post:
+      operationId: marketBarSubscribe
+      summary: Subscribe to real-time intraday bars
+      description: >-
+        Creates a real-time intraday bar subscription for a security.
+        Delivers periodic OHLCV bar updates at the specified interval.
+      tags:
+        - Market Bar Data
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MarketBarSubscription'
+      responses:
+        '200':
+          description: Bar subscription created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionResponse'
+  /blp/apiflds/FieldInfoRequest:
+    post:
+      operationId: fieldInfoRequest
+      summary: Get field metadata
+      description: >-
+        Retrieves metadata about specific Bloomberg data fields, including
+        their mnemonics, descriptions, data types, and documentation text.
+      tags:
+        - Field Information
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FieldInfoRequest'
+            examples:
+              fieldLookup:
+                summary: Get info about PX_LAST field
+                value:
+                  id:
+                    - PX_LAST
+                  returnFieldDocumentation: 'true'
+      responses:
+        '200':
+          description: Field information retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FieldInfoResponse'
+  /blp/apiflds/FieldSearchRequest:
+    post:
+      operationId: fieldSearchRequest
+      summary: Search for Bloomberg fields
+      description: >-
+        Searches for Bloomberg fields matching a keyword or search
+        specification. Useful for discovering available data fields.
+      tags:
+        - Field Information
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FieldSearchRequest'
+      responses:
+        '200':
+          description: Field search results returned successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FieldSearchResponse'
+  /blp/instruments/instrumentListRequest:
+    post:
+      operationId: instrumentListRequest
+      summary: Search for instruments
+      description: >-
+        Searches for Bloomberg instruments matching a query string with
+        optional filtering by yellow key (market sector). Returns a list
+        of matching security identifiers with descriptions.
+      tags:
+        - Instruments
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InstrumentListRequest'
+            examples:
+              searchIBM:
+                summary: Search for IBM instruments
+                value:
+                  query: IBM
+                  yellowKeyFilter: YK_FILTER_EQUITY
+                  maxResults: 10
+      responses:
+        '200':
+          description: Instrument search results returned successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstrumentListResponse'
+  /blp/instruments/curveListRequest:
+    post:
+      operationId: curveListRequest
+      summary: Search for yield curves
+      description: >-
+        Searches for Bloomberg yield curves matching specified criteria
+        including country, currency, type, and subtype.
+      tags:
+        - Instruments
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CurveListRequest'
+      responses:
+        '200':
+          description: Curve search results returned successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurveListResponse'
+  /blp/instruments/govtListRequest:
+    post:
+      operationId: govtListRequest
+      summary: Search for government securities
+      description: >-
+        Searches for government bond instruments matching specified
+        criteria including ticker and partial match parameters.
+      tags:
+        - Instruments
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GovtListRequest'
+      responses:
+        '200':
+          description: Government instrument results returned successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GovtListResponse'
+components:
+  schemas:
+    ReferenceDataRequest:
+      type: object
+      description: Request for current reference data.
+      required:
+        - securities
+        - fields
+      properties:
+        securities:
+          type: array
+          description: Bloomberg security identifiers.
+          items:
+            type: string
+          minItems: 1
+        fields:
+          type: array
+          description: Bloomberg field mnemonics.
+          items:
+            type: string
+          minItems: 1
+        overrides:
+          type: array
+          description: Field override specifications.
+          items:
+            $ref: '#/components/schemas/FieldOverride'
+        returnEids:
+          type: boolean
+          description: Return entitlement identifiers.
+        returnFormattedValue:
+          type: boolean
+          description: Return formatted values as strings.
+        useUTCTime:
+          type: boolean
+          description: Return times in UTC.
+        forcedDelay:
+          type: boolean
+          description: Force delayed data.
+    ReferenceDataResponse:
+      type: object
+      description: Response containing current reference data.
+      properties:
+        securityData:
+          type: array
+          items:
+            $ref: '#/components/schemas/SecurityData'
+    HistoricalDataRequest:
+      type: object
+      description: Request for historical end-of-day data.
+      required:
+        - securities
+        - fields
+        - startDate
+        - endDate
+      properties:
+        securities:
+          type: array
+          items:
+            type: string
+          minItems: 1
+        fields:
+          type: array
+          items:
+            type: string
+          minItems: 1
+        startDate:
+          type: string
+          pattern: '^\d{8}$'
+          description: Start date in YYYYMMDD format.
+        endDate:
+          type: string
+          pattern: '^\d{8}$'
+          description: End date in YYYYMMDD format.
+        periodicitySelection:
+          type: string
+          enum:
+            - DAILY
+            - WEEKLY
+            - MONTHLY
+            - QUARTERLY
+            - SEMI_ANNUALLY
+            - YEARLY
+        periodicityAdjustment:
+          type: string
+          enum:
+            - ACTUAL
+            - CALENDAR
+            - FISCAL
+        currency:
+          type: string
+          description: ISO 4217 currency code for conversion.
+        overrides:
+          type: array
+          items:
+            $ref: '#/components/schemas/FieldOverride'
+        maxDataPoints:
+          type: integer
+        nonTradingDayFillOption:
+          type: string
+          enum:
+            - NON_TRADING_WEEKDAYS
+            - ALL_CALENDAR_DAYS
+            - ACTIVE_DAYS_ONLY
+        nonTradingDayFillMethod:
+          type: string
+          enum:
+            - PREVIOUS_VALUE
+            - NIL_VALUE
+        adjustmentNormal:
+          type: boolean
+        adjustmentAbnormal:
+          type: boolean
+        adjustmentSplit:
+          type: boolean
+        calendarCodeOverride:
+          type: string
+        pricingOption:
+          type: string
+          enum:
+            - PRICING_OPTION_PRICE
+            - PRICING_OPTION_YIELD
+    HistoricalDataResponse:
+      type: object
+      description: Response containing historical data.
+      properties:
+        securityData:
+          type: array
+          items:
+            type: object
+            properties:
+              security:
+                type: string
+              eidData:
+                type: array
+                items:
+                  type: integer
+              sequenceNumber:
+                type: integer
+              fieldExceptions:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FieldException'
+              fieldData:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    date:
+                      type: string
+                      format: date
+                  additionalProperties: true
+    IntradayBarRequest:
+      type: object
+      description: Request for intraday bar data.
+      required:
+        - security
+        - eventType
+        - startDateTime
+        - endDateTime
+        - interval
+      properties:
+        security:
+          type: string
+        eventType:
+          type: string
+          enum:
+            - TRADE
+            - BID
+            - ASK
+            - BID_BEST
+            - ASK_BEST
+            - BEST_BID
+            - BEST_ASK
+        startDateTime:
+          type: string
+          format: date-time
+        endDateTime:
+          type: string
+          format: date-time
+        interval:
+          type: integer
+          minimum: 1
+          maximum: 1440
+        gapFillInitialBar:
+          type: boolean
+        adjustmentNormal:
+          type: boolean
+        adjustmentAbnormal:
+          type: boolean
+        adjustmentSplit:
+          type: boolean
+    IntradayBarResponse:
+      type: object
+      description: Response containing intraday bar data.
+      properties:
+        barData:
+          type: object
+          properties:
+            eidData:
+              type: array
+              items:
+                type: integer
+            barTickData:
+              type: array
+              items:
+                $ref: '#/components/schemas/BarTickData'
+    IntradayTickRequest:
+      type: object
+      description: Request for intraday tick data.
+      required:
+        - security
+        - startDateTime
+        - endDateTime
+      properties:
+        security:
+          type: string
+        eventTypes:
+          type: array
+          items:
+            type: string
+            enum:
+              - TRADE
+              - BID
+              - ASK
+              - BID_BEST
+              - ASK_BEST
+              - MID_PRICE
+              - AT_TRADE
+              - BEST_BID
+              - BEST_ASK
+        startDateTime:
+          type: string
+          format: date-time
+        endDateTime:
+          type: string
+          format: date-time
+        includeConditionCodes:
+          type: boolean
+        includeExchangeCodes:
+          type: boolean
+        includeBrokerCodes:
+          type: boolean
+        includeRpsCodes:
+          type: boolean
+        includeNonPlottableEvents:
+          type: boolean
+    IntradayTickResponse:
+      type: object
+      description: Response containing intraday tick data.
+      properties:
+        tickData:
+          type: object
+          properties:
+            eidData:
+              type: array
+              items:
+                type: integer
+            tickData:
+              type: array
+              items:
+                $ref: '#/components/schemas/TickData'
+    MarketDataSubscription:
+      type: object
+      description: Real-time market data subscription request.
+      required:
+        - subscriptions
+      properties:
+        subscriptions:
+          type: array
+          items:
+            type: object
+            required:
+              - security
+              - fields
+              - correlationId
+            properties:
+              security:
+                type: string
+              fields:
+                type: array
+                items:
+                  type: string
+              correlationId:
+                type: integer
+              interval:
+                type: number
+                description: Minimum interval between updates in seconds.
+    MarketBarSubscription:
+      type: object
+      description: Real-time intraday bar subscription request.
+      required:
+        - subscriptions
+      properties:
+        subscriptions:
+          type: array
+          items:
+            type: object
+            required:
+              - security
+              - correlationId
+            properties:
+              security:
+                type: string
+              correlationId:
+                type: integer
+              interval:
+                type: integer
+                description: Bar interval in minutes.
+    SubscriptionResponse:
+      type: object
+      description: Confirmation of subscription creation.
+      properties:
+        subscriptions:
+          type: array
+          items:
+            type: object
+            properties:
+              correlationId:
+                type: integer
+              status:
+                type: string
+                enum:
+                  - subscribed
+                  - failed
+              message:
+                type: string
+    FieldInfoRequest:
+      type: object
+      description: Request for field metadata.
+      properties:
+        id:
+          type: array
+          items:
+            type: string
+          minItems: 1
+        returnFieldDocumentation:
+          type: string
+          enum:
+            - 'true'
+            - 'false'
+    FieldInfoResponse:
+      type: object
+      description: Response containing field metadata.
+      properties:
+        fieldData:
+          type: array
+          items:
+            $ref: '#/components/schemas/FieldInfo'
+    FieldSearchRequest:
+      type: object
+      description: Request to search for fields.
+      properties:
+        searchSpec:
+          type: string
+          description: Search term for finding fields.
+        returnFieldDocumentation:
+          type: string
+          enum:
+            - 'true'
+            - 'false'
+    FieldSearchResponse:
+      type: object
+      description: Response containing field search results.
+      properties:
+        fieldData:
+          type: array
+          items:
+            $ref: '#/components/schemas/FieldInfo'
+    InstrumentListRequest:
+      type: object
+      description: Request to search for instruments.
+      required:
+        - query
+      properties:
+        query:
+          type: string
+          description: Search string for instruments.
+        yellowKeyFilter:
+          type: string
+          description: Filter by market sector.
+          enum:
+            - YK_FILTER_NONE
+            - YK_FILTER_CMDT
+            - YK_FILTER_EQUITY
+            - YK_FILTER_MUNI
+            - YK_FILTER_PRFD
+            - YK_FILTER_CLNT
+            - YK_FILTER_MMKT
+            - YK_FILTER_GOVT
+            - YK_FILTER_CORP
+            - YK_FILTER_INDX
+            - YK_FILTER_CURR
+            - YK_FILTER_MTGE
+        languageOverride:
+          type: string
+          description: ISO language code for results.
+        maxResults:
+          type: integer
+          description: Maximum number of results.
+    InstrumentListResponse:
+      type: object
+      description: Instrument search results.
+      properties:
+        results:
+          type: array
+          items:
+            type: object
+            properties:
+              security:
+                type: string
+              description:
+                type: string
+    CurveListRequest:
+      type: object
+      description: Request to search for yield curves.
+      properties:
+        query:
+          type: string
+        countryCode:
+          type: string
+        currencyCode:
+          type: string
+        type:
+          type: string
+        subtype:
+          type: string
+        maxResults:
+          type: integer
+    CurveListResponse:
+      type: object
+      description: Curve search results.
+      properties:
+        results:
+          type: array
+          items:
+            type: object
+            properties:
+              curve:
+                type: string
+              description:
+                type: string
+              country:
+                type: string
+              currency:
+                type: string
+              type:
+                type: string
+              subtype:
+                type: string
+    GovtListRequest:
+      type: object
+      description: Request to search for government securities.
+      properties:
+        query:
+          type: string
+        ticker:
+          type: string
+        partialMatch:
+          type: boolean
+        maxResults:
+          type: integer
+    GovtListResponse:
+      type: object
+      description: Government instrument search results.
+      properties:
+        results:
+          type: array
+          items:
+            type: object
+            properties:
+              security:
+                type: string
+              description:
+                type: string
+              ticker:
+                type: string
+              coupon:
+                type: number
+              maturityDate:
+                type: string
+                format: date
+    SecurityData:
+      type: object
+      description: Data container for a single security.
+      properties:
+        security:
+          type: string
+          description: Bloomberg security identifier.
+        eidData:
+          type: array
+          items:
+            type: integer
+        sequenceNumber:
+          type: integer
+        fieldExceptions:
+          type: array
+          items:
+            $ref: '#/components/schemas/FieldException'
+        fieldData:
+          type: object
+          additionalProperties: true
+          description: Field values as key-value pairs.
+        securityError:
+          $ref: '#/components/schemas/SecurityError'
+    FieldOverride:
+      type: object
+      required:
+        - fieldId
+        - value
+      properties:
+        fieldId:
+          type: string
+        value:
+          type: string
+    FieldException:
+      type: object
+      properties:
+        fieldId:
+          type: string
+        errorInfo:
+          type: object
+          properties:
+            source:
+              type: string
+            code:
+              type: integer
+            category:
+              type: string
+            message:
+              type: string
+            subcategory:
+              type: string
+    SecurityError:
+      type: object
+      properties:
+        source:
+          type: string
+        code:
+          type: integer
+        category:
+          type: string
+        message:
+          type: string
+        subcategory:
+          type: string
+    FieldInfo:
+      type: object
+      description: Bloomberg field metadata.
+      properties:
+        id:
+          type: string
+        fieldInfo:
+          type: object
+          properties:
+            mnemonic:
+              type: string
+            description:
+              type: string
+            datatype:
+              type: string
+            documentation:
+              type: string
+            categoryName:
+              type: array
+              items:
+                type: string
+            property:
+              type: array
+              items:
+                type: string
+            overrides:
+              type: array
+              items:
+                type: string
+            ftype:
+              type: string
+    BarTickData:
+      type: object
+      description: A single intraday bar data point.
+      properties:
+        time:
+          type: string
+          format: date-time
+        open:
+          type: number
+        high:
+          type: number
+        low:
+          type: number
+        close:
+          type: number
+        volume:
+          type: integer
+        numEvents:
+          type: integer
+        value:
+          type: number
+    TickData:
+      type: object
+      description: A single tick data point.
+      properties:
+        time:
+          type: string
+          format: date-time
+        type:
+          type: string
+        value:
+          type: number
+        size:
+          type: integer
+        conditionCodes:
+          type: string
+        exchangeCode:
+          type: string
+        brokerBuyCode:
+          type: string
+        brokerSellCode:
+          type: string
+        rpsCode:
+          type: string
