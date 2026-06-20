@@ -7,7 +7,7 @@ description: The Bloomberg Terminal (Bloomberg Professional Service) is the flag
   standard infrastructure for financial markets professionals. Developers can access
   Terminal data programmatically via the Bloomberg Open API (BLPAPI).
 type: Index
-image: https://kinlane-productions.s3.amazonaws.com/apis-json/apis-json-logo.jpg
+image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
 url: https://raw.githubusercontent.com/api-evangelist/bloomberg-terminal/refs/heads/main/apis.yml
 created: '2024-01-01'
 modified: '2026-04-21'
