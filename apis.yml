@@ -43,10 +43,10 @@ apis:
     url: https://data.bloomberglp.com/professional/sites/10/2017/03/BLPAPI-Core-Developer-Guide.pdf
   - type: GitHubRepository
     url: https://github.com/bloomberg/blpapi-node
-  - type: SDK
+  - type: SDKs
     url: https://pypi.org/project/blpapi/
     title: Python SDK
-  - type: SDK
+  - type: SDKs
     url: https://www.npmjs.com/package/blpapi
     title: Node.js SDK
 - aid: bloomberg-terminal:bloomberg-excel-addin
@@ -101,10 +101,10 @@ common:
   url: https://developer.bloomberg.com/
 - type: GitHubOrganization
   url: https://github.com/bloomberg
-- type: SDK
+- type: SDKs
   url: https://pypi.org/project/blpapi/
   title: Python SDK (blpapi)
-- type: SDK
+- type: SDKs
   url: https://www.npmjs.com/package/blpapi
   title: Node.js SDK
 - type: TermsOfService
