@@ -95,6 +95,8 @@ apis:
   - type: Documentation
     url: https://www.bloomberg.com/professional/solution/emsx/
 common:
+- type: DomainSecurity
+  url: security/bloomberg-terminal-domain-security.yml
 - type: Portal
   url: https://www.bloomberg.com/professional/
 - type: Documentation
