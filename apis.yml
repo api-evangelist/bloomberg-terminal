@@ -107,6 +107,12 @@ apis:
   - type: Documentation
     url: https://www.bloomberg.com/professional/solution/emsx/
 common:
+- type: IssueTracker
+  url: https://github.com/bloomberg/blpapi-node/issues
+- type: CodeOfConduct
+  url: https://github.com/bloomberg/.github/blob/main/CODE_OF_CONDUCT.md
+- type: ContributionGuide
+  url: https://github.com/bloomberg/.github/blob/main/CONTRIBUTING.md
 - type: DomainSecurity
   url: security/bloomberg-terminal-domain-security.yml
 - type: Portal
