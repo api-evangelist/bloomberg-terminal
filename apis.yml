@@ -141,6 +141,8 @@ apis:
   - type: Documentation
     url: https://www.bloomberg.com/professional/solution/bloomberg-terminal/
 common:
+- type: Website
+  url: https://bloomberg.com
 - type: ParentCompany
   url: https://apis.io/providers/bloomberg/
   name: Bloomberg
