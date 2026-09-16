@@ -1,10 +1,10 @@
 aid: bloomberg-terminal
 name: Bloomberg Terminal
-description: The Bloomberg Terminal (Bloomberg Professional Service) is the flagship product of Bloomberg LP, providing
-  financial professionals with real-time market data, news, analytics, trading capabilities, and secure messaging
-  through a unified workstation. The Terminal connects over 325,000 subscribers globally and is the standard infrastructure
-  for financial markets professionals. Developers can access Terminal data programmatically via the Bloomberg Open
-  API (BLPAPI).
+description: The Bloomberg Terminal (Bloomberg Professional Service) is the flagship product of Bloomberg
+  LP, providing financial professionals with real-time market data, news, analytics, trading capabilities,
+  and secure messaging through a unified workstation. The Terminal connects over 325,000 subscribers globally
+  and is the standard infrastructure for financial markets professionals. Developers can access Terminal
+  data programmatically via the Bloomberg Open API (BLPAPI).
 type: Index
 deliveryModel:
   model: unknown
@@ -33,7 +33,7 @@ accessModel:
 image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/bloomberg-terminal.png
 url: https://raw.githubusercontent.com/api-evangelist/bloomberg-terminal/refs/heads/main/apis.yml
 created: '2024-01-01'
-modified: '2026-08-27'
+modified: '2026-09-16'
 specificationVersion: '0.23'
 tags:
 - Terminal
@@ -46,9 +46,10 @@ tags:
 apis:
 - aid: bloomberg-terminal:blpapi
   name: Bloomberg Open API (BLPAPI)
-  description: The Bloomberg Open API (BLPAPI) enables programmatic access to Bloomberg Terminal data from applications
-    running on the same machine or connecting via Bloomberg's network. Provides real-time data subscriptions, reference
-    data requests, historical data, and Bloomberg analytics. SDKs for Python, Java, C++, C#, and Perl.
+  description: The Bloomberg Open API (BLPAPI) enables programmatic access to Bloomberg Terminal data
+    from applications running on the same machine or connecting via Bloomberg's network. Provides real-time
+    data subscriptions, reference data requests, historical data, and Bloomberg analytics. SDKs for Python,
+    Java, C++, C#, and Perl.
   humanURL: https://bloomberg.github.io/blpapi-docs/
   baseURL: blpapi://localhost:8194
   tags:
@@ -72,8 +73,9 @@ apis:
     title: Node.js SDK
 - aid: bloomberg-terminal:bloomberg-excel-addin
   name: Bloomberg Excel Add-in
-  description: Extends Bloomberg Terminal functionality into Microsoft Excel with BDP, BDH, BDS, and BQL formula
-    functions for retrieving real-time, historical, and reference data directly in spreadsheet cells.
+  description: Extends Bloomberg Terminal functionality into Microsoft Excel with BDP, BDH, BDS, and BQL
+    formula functions for retrieving real-time, historical, and reference data directly in spreadsheet
+    cells.
   humanURL: https://www.bloomberg.com/professional/solution/bloomberg-excel/
   baseURL: https://bloomberg.com/excel
   tags:
@@ -87,8 +89,8 @@ apis:
     url: https://www.bloomberg.com/professional/solution/bloomberg-excel/
 - aid: bloomberg-terminal:bloomberg-ib
   name: Bloomberg IB (Instant Bloomberg)
-  description: Secure messaging platform built into the Bloomberg Terminal enabling real-time communication between
-    financial professionals globally, with compliance archiving and monitoring capabilities.
+  description: Secure messaging platform built into the Bloomberg Terminal enabling real-time communication
+    between financial professionals globally, with compliance archiving and monitoring capabilities.
   humanURL: https://www.bloomberg.com/professional/product/bloomberg-messaging/
   baseURL: blpapi://localhost:8194
   tags:
@@ -100,9 +102,9 @@ apis:
     url: https://www.bloomberg.com/professional/product/bloomberg-messaging/
 - aid: bloomberg-terminal:bloomberg-emsx
   name: Bloomberg EMSX
-  description: Electronic trading and order management system integrated in the Bloomberg Terminal for routing orders
-    to brokers across equities, fixed income, FX, and derivatives with FIX connectivity and algorithmic trading
-    support.
+  description: Electronic trading and order management system integrated in the Bloomberg Terminal for
+    routing orders to brokers across equities, fixed income, FX, and derivatives with FIX connectivity
+    and algorithmic trading support.
   humanURL: https://www.bloomberg.com/professional/solution/emsx/
   baseURL: blpapi://localhost:8194
   tags:
@@ -113,6 +115,31 @@ apis:
   properties:
   - type: Documentation
     url: https://www.bloomberg.com/professional/solution/emsx/
+- name: Bloomberg Anywhere
+  description: Remote access service extending Bloomberg Terminal functionality to any internet-connected
+    device. Provides authentication and secure remote access to Terminal data, analytics, and messaging.
+  humanURL: https://www.bloomberg.com/professional/solution/bloomberg-anywhere/
+  baseURL: https://bba.bloomberg.net
+  tags:
+  - Remote Access
+  - Mobile
+  - Anywhere
+  properties:
+  - type: Documentation
+    url: https://www.bloomberg.com/professional/solution/bloomberg-anywhere/
+- name: Bloomberg Launchpad
+  description: Customizable Bloomberg Terminal display consisting of smaller panels for monitoring multiple
+    securities, markets, and data streams simultaneously. Supports custom configurations for different
+    workflow types.
+  humanURL: https://www.bloomberg.com/professional/solution/bloomberg-terminal/
+  baseURL: blpapi://localhost:8194
+  tags:
+  - Launchpad
+  - Terminal Dashboard
+  - Monitoring
+  properties:
+  - type: Documentation
+    url: https://www.bloomberg.com/professional/solution/bloomberg-terminal/
 common:
 - type: ParentCompany
   url: https://apis.io/providers/bloomberg/
@@ -186,3 +213,5 @@ maintainers:
   email: kinlane@gmail.com
 x-parent: bloomberg
 x-relationship: product
+x-aliases:
+- Bloomberg Terminals
