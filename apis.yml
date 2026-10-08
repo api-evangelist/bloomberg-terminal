@@ -147,6 +147,12 @@ apis:
   - type: Documentation
     url: https://www.bloomberg.com/professional/solution/bloomberg-terminal/
 common:
+- type: Plans
+  url: plans/bloomberg-terminal-plans-pricing.yml
+- type: RateLimits
+  url: rate-limits/bloomberg-terminal-rate-limits.yml
+- type: FinOps
+  url: finops/bloomberg-terminal-finops.yml
 - type: Website
   url: https://bloomberg.com
 - type: ParentCompany
