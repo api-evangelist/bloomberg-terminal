@@ -64,23 +64,111 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-The Bloomberg Terminal (Bloomberg Professional Service) is Bloomberg LP's flagship product, providing financial professionals with real-time market data, news, analytics, trading capabilities, and secure messaging through a unified workstation, connecting over 325,000 subscribers globally.
+The Bloomberg Terminal (Bloomberg Professional Service) is the flagship product of Bloomberg LP, providing financial professionals with real-time market data, news, analytics, trading capabilities, and secure messaging through a unified workstation. The Terminal connects over 325,000 subscribers globally and is the standard infrastructure for financial markets professionals. Developers can access Terminal data programmatically via the Bloomberg Open API (BLPAPI).
 
-## APIs
+**Areas:** Terminal · Bloomberg Professional Service · Market Data · Financial Workstation · Trading · Analytics · Bloomberg
 
-- **Bloomberg Open API (BLPAPI)** - Programmatic access to Terminal data
-- **Bloomberg Excel Add-in** - BDP, BDH, BDS formulas for Excel integration
-- **Bloomberg IB (Instant Bloomberg)** - Secure messaging platform
-- **Bloomberg EMSX** - Electronic order management and trading
+## Bloomberg Terminal on APIs.io
 
-## Resources
+Everything profiled for Bloomberg Terminal is published on APIs.io rather than in this repository. Start at the provider page — **[apis.io/providers/bloomberg-terminal/](https://apis.io/providers/bloomberg-terminal/)** — or go straight to one of the APIs or properties below.
 
-- [Bloomberg Professional Portal](https://www.bloomberg.com/professional/)
-- [Bloomberg Developer Portal](https://developer.bloomberg.com/)
-- [BLPAPI Documentation](https://bloomberg.github.io/blpapi-docs/)
-- [Bloomberg GitHub](https://github.com/bloomberg)
-- [Python SDK](https://pypi.org/project/blpapi/)
+### APIs (6)
 
-## Profile
+- [Bloomberg Open API (BLPAPI)](https://apis.io/apis/bloomberg-terminal/blpapi/) — The Bloomberg Open API (BLPAPI) enables programmatic access to Bloomberg Terminal data from applications running on the same machine or connecting via…
+- [Bloomberg Excel Add-in](https://apis.io/apis/bloomberg-terminal/bloomberg-excel-addin/) — Extends Bloomberg Terminal functionality into Microsoft Excel with BDP, BDH, BDS, and BQL formula functions for retrieving real-time, historical, and…
+- [Bloomberg IB (Instant Bloomberg)](https://apis.io/apis/bloomberg-terminal/bloomberg-ib/) — Secure messaging platform built into the Bloomberg Terminal enabling real-time communication between financial professionals globally, with compliance…
+- [Bloomberg EMSX](https://apis.io/apis/bloomberg-terminal/bloomberg-emsx/) — Electronic trading and order management system integrated in the Bloomberg Terminal for routing orders to brokers across equities, fixed income, FX, and…
+- [Bloomberg Anywhere](https://apis.io/apis/bloomberg-terminal/bloomberg-anywhere/) — Remote access service extending Bloomberg Terminal functionality to any internet-connected device. Provides authentication and secure remote access to…
+- [Bloomberg Launchpad](https://apis.io/apis/bloomberg-terminal/bloomberg-launchpad/) — Customizable Bloomberg Terminal display consisting of smaller panels for monitoring multiple securities, markets, and data streams simultaneously. Supports…
 
-See [apis.yml](apis.yml) for the full API profile.
+### Published properties
+
+Each property below is a page on APIs.io carrying the machine-readable artifact and what it says.
+
+#### Security (1)
+
+Authentication, trust centre, and vulnerability disclosure.
+
+- [Bloomberg Terminal Domain Security](https://apis.io/security/bloomberg-terminal/bloomberg-terminal-domain-security/)
+
+#### Plans and pricing (1)
+
+Published plans, tiers and prices.
+
+- [Bloomberg Terminal Plans Pricing](https://apis.io/plans/bloomberg-terminal/bloomberg-terminal-plans-pricing/)
+
+#### Rate limits (1)
+
+Published request limits.
+
+- [Bloomberg Terminal Rate Limits](https://apis.io/rate-limits/bloomberg-terminal/bloomberg-terminal-rate-limits/)
+
+#### FinOps (1)
+
+What the API costs to run, by operation.
+
+- [Bloomberg Terminal Finops](https://apis.io/finops/bloomberg-terminal/bloomberg-terminal-finops/)
+
+## Where to find this API
+
+Links to the company's own pages. This repository publishes no copy of their specifications — the canonical document is theirs and lives at the URLs below.
+
+- [Website](https://bloomberg.com)
+- [Documentation](https://developer.bloomberg.com/)
+- [Support](https://www.bloomberg.com/professional/support/)
+- [Terms of service](https://www.bloomberg.com/notices/tos/)
+- [Privacy policy](https://www.bloomberg.com/privacy/)
+- [GitHub](https://github.com/bloomberg)
+
+## API Evangelist rating
+
+**Kin Score 21.7** — emerging · rubric 0.24.0 · scored 2026-10-17
+
+| Facet | Score |
+|---|---|
+| Discoverability | 62.5 |
+| Contract quality | 0.0 |
+| Contract governance | 0.0 |
+| Operational transparency | 10.5 |
+| Developer ergonomics | 42.9 |
+| Access clarity | 28.9 |
+
+**Agent readiness 0.6** — human-only
+
+| Agent-readiness dimension | Result |
+|---|---|
+| Spec Presence | — |
+| Agentic Access | — |
+| Reversibility Documented | — |
+| MCP Server | — |
+| Auth Clarity | — |
+| Idempotency | — |
+| Error Semantics | — |
+| OpenAPI Examples | — |
+| Rate Limit Signal | derived (partial credit) |
+| Event Surface Described | — |
+| Agent Skills | — |
+| Well Known Catalog | — |
+| Consent Identity | — |
+| Agent Card | — |
+| Dry Run Mode | — |
+| Delegated Identity | — |
+| Protected Resource Metadata | — |
+| Dynamic Client Registration | — |
+| Agentic Commerce | — |
+
+**Regulatory alignment 18.5** — Securities & Market Data
+
+The rubric is published at [github.com/api-evangelist/kin-score](https://github.com/api-evangelist/kin-score). The per-check breakdown behind these numbers — which checks were earned, partial or missed — along with score history and how this provider compares to its peers, is available at [apis.io/providers/bloomberg-terminal/](https://apis.io/providers/bloomberg-terminal/).
+
+## How this profile is made
+
+API Evangelist profiles a company's public API surface the way a developer would find it: the website, developer portal and documentation, the specifications it publishes, its public repositories, and its pricing, status and changelog pages. From that it derives the properties above — contracts split per API, workflows, schemas, collections, governance rules, plans and rate limits — and scores them against the published [Kin Score rubric](https://github.com/api-evangelist/kin-score).
+
+The artifacts are published on [APIs.io](https://apis.io), not in this repository. This repository is the public record for Bloomberg Terminal: the place to say something is wrong, missing or out of date, and to ask for a re-score or a removal.
+
+## Open an issue
+
+- **Something about this listing** — a wrong description, a missing API, a stale artifact or a question about the rating: [open an issue on this repository](https://github.com/api-evangelist/bloomberg-terminal/issues/new).
+- **A new API, or one that is not in the catalog yet** — [submit it on APIs.io](https://apis.io/add/).
+- **Anything else** — [the APIs.io inbox](https://github.com/api-search/inbox/issues/new) or [info@apievangelist.com](mailto:info@apievangelist.com).
